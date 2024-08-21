@@ -1,0 +1,34 @@
+services:
+  frontend:
+    container_name: progate-frontend
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend
+    command: /bin/sh -c 'npm install && npm run dev'
+    environment:
+      - WATCHPACK_POLLING=true
+    tty: true
+
+  backend:
+    container_name: progate-backend
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app/backend
+    tty: true
+
+  voicevox:
+    container_name: progate_voicevox
+    build:
+      context: .
+      dockerfile: ./voicevox/Dockerfile
+    ports:
+      - "50021:50021"
+    tty: true
