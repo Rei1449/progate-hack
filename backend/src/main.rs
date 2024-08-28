@@ -1,9 +1,12 @@
-use std::str::Chars;
+use std::{backtrace, str::Chars, panic};
 
-use actix_web::{get, web, App, HttpServer, Responder, HttpResponse};
+use actix_web::http::header::{Accept, ACCEPT};
+use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
 // use actix_web::{actix, client};
 use reqwest::Client;
+use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use serde_json::Value;
+use std::collections::HashMap;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub struct ReturnCheckBody {
@@ -67,6 +70,24 @@ fn check_body(body_data: Chars) -> ReturnCheckBody {
     return_data
 }
 
+async fn test_voicevox() -> HttpResponse {
+    // let mut map = HashMap::new();
+    // map.insert("speaker", "1");
+    // map.insert("text", "aa");
+
+    let client = Client::new();
+    let url = "http://0.0.0.0:50021/audio_query?text=qqq&speaker=3";
+    let response = client
+        .post(url)
+        .header("Content-Type", "application/json")
+        // .json(&map)
+        .send()
+        .await;
+        // .expect("Failed to send request");
+    println!("{:?}",response);
+    println!("test_voicevox");
+    HttpResponse::Ok().content_type("application/json").body(r#"{"return":"ok"}"#)
+}
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -145,12 +166,76 @@ async fn qiita() -> HttpResponse {
         .body(json_string)
 }
 
+#[post("/vv")]
+async fn vv_test() -> HttpResponse {
+    println!("vv");
+    let client = Client::new();
+    let url = "http://localhost:50021/audio_query?text=qqq&speaker=3";
+    let response = match client
+        .post(url)
+        .header("Content-Type", "application/json")
+        .send()
+        .await
+    {
+        Ok(resp) => match resp.text().await {
+            Ok(body) => body,
+            Err(e) => format!("Failed to read response body: {:?}", e),
+        },
+        Err(e) => format!("Failed to send request: {:?}", e),
+    };
+
+    println!("Response: {:?}", response);
+
+    // HTTPレスポンスを返す
+    HttpResponse::Ok().content_type("application/json").body(format!(r#"{{"response": "{}"}}"#, response))
+    // println!("{:?}",response);
+    // println!("test_voicevox");
+    // HttpResponse::Ok().content_type("application/json").body(r#"{"return":"ok"}"#)
+    // test_voicevox().await;
+    // HttpResponse::Ok().content_type("application/json").body(r#"{"return":"ok"}"#)
+}
+#[post("/voice")]
+async fn voice() -> HttpResponse {
+    let mut headers = HeaderMap::new();
+    headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+    // map.insert("accept", "audio/wav");
+    // map.insert("Content-Type", "application/json");
+    let client = Client::new();
+    let url = "http://localhost:50021/synthesis?speaker=3";
+    let response = match client
+        .post(url)
+        .headers(headers)
+        .send()
+        .await
+    {
+        Ok(resp) => match resp.text().await {
+            Ok(body) => body,
+            Err(e) => format!("Failed to read response body: {:?}", e),
+        },
+        Err(e) => format!("Failed to send request: {:?}", e),
+    };
+
+    println!("Response: {:?}", response);
+
+    // HTTPレスポンスを返す
+    HttpResponse::Ok().content_type("application/json").body(format!(r#"{{"response": "{}"}}"#, response))
+
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // panic::set_hook(Box::new(|panic_info| {
+    //     let backtrace = backtrace::Backtrace::capture();
+    //     eprintln!("Panic occurred: {:?}", panic_info);
+    //     eprintln!("Backtrace: {:?}", backtrace);
+    // }));
+
     HttpServer::new(|| {
         App::new()
             .service(hello)
             .service(qiita)
+            .service(vv_test)
+            .service(voice)
             .route("/hey", web::get().to(manual_hello))
     })
     .bind(("0.0.0.0", 8080))?
