@@ -6,6 +6,7 @@ use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
 use reqwest::Client;
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use serde_json::Value;
+use actix_cors::Cors;
 use std::collections::HashMap;
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -231,7 +232,11 @@ async fn main() -> std::io::Result<()> {
     // }));
 
     HttpServer::new(|| {
+
+        let cors = Cors::permissive();
+
         App::new()
+            .wrap(cors)
             .service(hello)
             .service(qiita)
             .service(vv_test)
