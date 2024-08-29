@@ -23,7 +23,7 @@ export default function Timer() {
             <TimerCategories />
             <div className="absolute mt-10 w-[80%] m-auto right-0 left-0 flex justify-between items-start">
                 <TimerLog />
-                <div className="">
+                <div>
                     <p className="text-[250px]"> {formatTime(seconds)}</p>
                     <div className="flex justify-between border-t border-gray-800">
                         {!isActive && !isPaused && (
