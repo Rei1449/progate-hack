@@ -164,7 +164,7 @@ async fn qiita() -> HttpResponse {
     );
     HttpResponse::Ok()
         .content_type("application/json")
-        .body(json_string)
+        .body(serde_json::json!({ "text": response_data.body_text }).to_string())
 }
 
 #[post("/vv")]
