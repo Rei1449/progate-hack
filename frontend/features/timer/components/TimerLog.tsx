@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function TimerLog() {
+export default function TimerLog({ category }: { category: string }) {
     const dummuyData = [
         { date: "08/30", time: 2000 },
         { date: "08/30", time: 2500 },
@@ -20,7 +20,7 @@ export default function TimerLog() {
     };
     return (
         <div className="w-[27%] bg-[#212121] h-[450px] rounded-xl px-10 py-10 overflow-y-scroll">
-            <p className="text-4xl">Qiita執筆</p>
+            <p className="text-4xl">{category}</p>
             {dummuyData.map(
                 (item: { date: string; time: number }, index: number) => (
                     <div

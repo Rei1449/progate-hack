@@ -1,11 +1,12 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useTimer } from "./hooks/useTimer";
 import TimerLog from "./components/TimerLog";
 import TimerCategories from "./components/TimerCategories";
 
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { TimerChart } from "./components/TimerChart";
+import TImercategoryForm from "./components/TImercategoryForm";
 
 export default function Timer() {
     const {
@@ -18,11 +19,21 @@ export default function Timer() {
         isActive,
         isPaused,
     } = useTimer();
+    const [viewCategory, setViewCategory] = useState("todo");
+    const handleClickCategory = (category: string) => {
+        setViewCategory(category);
+        if (seconds > 0 && confirm("現在の作業を完了しますか？")) {
+            stopTimer();
+        }
+    };
     return (
         <>
-            <TimerCategories />
+            <div className="flex justify-between items-center w-[80%] mt-10 m-auto">
+                <TimerCategories handleClickCategory={handleClickCategory} />
+                <TImercategoryForm />
+            </div>
             <div className="absolute mt-10 w-[80%] m-auto right-0 left-0 flex justify-between items-start">
-                <TimerLog />
+                <TimerLog category={viewCategory} />
                 <div>
                     <p className="text-[250px]"> {formatTime(seconds)}</p>
                     <div className="flex justify-between border-t border-gray-800">
