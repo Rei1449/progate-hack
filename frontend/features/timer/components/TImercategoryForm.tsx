@@ -2,7 +2,7 @@ import React from "react";
 
 export default function TImercategoryForm() {
     return (
-        <form className="w-[20%] relative">
+        <form className="md:w-[20%] w-[90%] m-auto relative md:mt-0">
             <input
                 type="text"
                 name="category"

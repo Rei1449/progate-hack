@@ -17,12 +17,12 @@ export default function Meeting() {
     const roomIds = ["hello", "hi", "hello world"];
     return (
         <Drawer>
-            <DrawerTrigger className="ml-5 flex items-center">
+            <DrawerTrigger className="md:ml-5 ml-2 flex items-center">
                 <img src="./chat.svg" className="w-[20px]" />
-                <p className="ml-2">Video</p>
+                <p className="ml-2 md:block hidden">Video</p>
             </DrawerTrigger>
-            <DrawerContent className="h-[80%] overflow-scroll bg-[#1f1f1f] border-none p-10">
-                <DrawerTitle className="font-bold text-2xl text-gray-300">
+            <DrawerContent className="h-[80%] overflow-scroll bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
+                <DrawerTitle className="font-bold text-2xl text-gray-300 mt-10 w-fit md:mx-0 mx-auto">
                     Video Room
                 </DrawerTitle>
                 <form>
@@ -35,13 +35,13 @@ export default function Meeting() {
                         作成する！
                     </button>
                 </form>
-                <p className="w-[60%] m-auto mt-10 text-gray-400 mb-0">
+                <p className="md:w-[60%] w-[90%] m-auto mt-10 text-gray-400 mb-0">
                     部屋一覧
                 </p>
                 {roomIds.map((id: string) => (
                     <div
                         key={id}
-                        className="m-auto mt-5 mb-0 border-b border-gray-700 w-[60%]"
+                        className="m-auto mt-5 mb-0 border-b border-gray-700 md:w-[60%] w-[90%]"
                     >
                         <Dialog>
                             <DialogTitle className="text-2xl">{id}</DialogTitle>
