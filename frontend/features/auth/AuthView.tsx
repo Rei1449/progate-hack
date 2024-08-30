@@ -12,7 +12,7 @@ export default function AuthView() {
                         src={`${data?.user?.image}`}
                         className="w-[20px] h-[20px] rounded-full"
                     />
-                    <p className="ml-2">{data?.user?.name}</p>
+                    <p className="ml-2 md:block hidden">{data?.user?.name}</p>
                 </>
             )}
         </div>

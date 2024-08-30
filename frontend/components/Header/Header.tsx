@@ -13,7 +13,7 @@ import AuthView from "@/features/auth/AuthView";
 export default function Header() {
     return (
         <header className=" w-screen top-0">
-            <div className="flex items-center justify-between p-5 w-[85%] m-auto border-b border-gray-800">
+            <div className="flex items-center justify-between p-5 md:w-[85%] w-[95%] m-auto border-b border-gray-800">
                 <div className="flex items-center">
                     <Clock />
                     <AuthView />

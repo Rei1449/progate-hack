@@ -30,12 +30,12 @@ export default function Reading() {
     };
     return (
         <Drawer>
-            <DrawerTrigger className="ml-5 flex items-center">
+            <DrawerTrigger className="md:ml-5 ml-2 flex items-center">
                 <img src="./music.svg" className="w-[20px]" />
-                <p className="ml-2">Article</p>
+                <p className="md:block hidden ml-2">Article</p>
             </DrawerTrigger>
-            <DrawerContent className="h-[80%] bg-[#1f1f1f] border-none p-10">
-                <DrawerTitle className="font-bold text-2xl text-gray-300">
+            <DrawerContent className="h-[80%] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
+                <DrawerTitle className="font-bold text-2xl text-gray-300 mt-10 w-fit md:mx-0 mx-auto">
                     Article Listening
                 </DrawerTitle>
                 <form onSubmit={(e) => handleUrlSubmit(e)}>

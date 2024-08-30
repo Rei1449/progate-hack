@@ -80,3 +80,15 @@
 .bg-green {
     background: linear-gradient(-2deg, rgb(1, 116, 22), rgb(3, 134, 27));
 }
+.text-90vw {
+    font-size: 90vw;
+}
+.no-bar::-webkit-scrollbar {
+    display: none;
+}
+.bg-origin-shadow-right {
+    background: linear-gradient(to right, #181818, #18181800);
+}
+.bg-origin-shadow-left {
+    background: linear-gradient(to left, #181818, #18181800);
+}
