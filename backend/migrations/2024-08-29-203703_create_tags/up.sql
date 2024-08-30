@@ -1,0 +1,8 @@
+-- Your SQL goes here
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR NOT NULL,
+    user_id TEXT NOT NULL
+    -- created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
