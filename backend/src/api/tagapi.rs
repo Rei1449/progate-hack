@@ -1,0 +1,73 @@
+use actix_web::HttpResponse;
+// use actix_web::http::StatusCode;
+use actix_web::{get, post, web, Result};
+
+// use std::env;
+use diesel::prelude::*;
+
+use crate::models::tagmodel::*;
+
+use diesel::Connection;
+
+use diesel::pg::PgConnection;
+
+use dotenv::dotenv;
+
+// use actix_web::{ Data };
+// use crate::database::Pool;
+
+// use diesel::pg::PgConnection;
+// use diesel::r2d2::{self, ConnectionManager};
+// pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
+
+
+fn db_connect() -> PgConnection {
+
+    dotenv().ok();
+
+    let db_url = std::env::var("DATABASE_URL").expect("Database Must Be Set");
+
+    PgConnection::establish(&db_url).expect(&format!("Error connecting to {}", &db_url))
+
+}
+
+#[post("/tag/create")]
+pub async fn save_tag(tag: web::Json<CreateTag>) -> Result<HttpResponse> {
+    use crate::schema::tags::dsl::*;
+    let mut connection = db_connect();
+
+    diesel::insert_into(tags)
+        .values(&tag.into_inner())
+        .execute(& mut connection)
+        .expect("Error inserting new tag");
+
+    Ok(HttpResponse::Ok().json("Tag Create Success."))
+
+}
+#[get("/tag")]
+pub async fn get_tag() -> Result<HttpResponse> {
+    use crate::schema::tags::dsl::*;
+    let mut connection = db_connect();
+
+    let data:Vec<TagResponse> = tags
+        .select((id,title,user_id))
+        // .filter(user_id,)
+        .load(&mut connection)
+        .unwrap();
+        // .optional();
+
+        // for d in data{
+        //     println!("{:?}",d);
+        // }
+    
+    let json_string = serde_json::to_string(&data).unwrap();
+
+    // Ok(HttpResponse::Ok().json("Tag Create Success."))
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(
+            serde_json::json!({ "text": json_string })
+            .to_string()
+        )
+    )
+}
