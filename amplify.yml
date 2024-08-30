@@ -1,6 +1,7 @@
 version: 1
 applications:
-  - frontend:
+  - appRoot: frontend
+    frontend:
       phases:
         preBuild:
           commands:
@@ -9,10 +10,9 @@ applications:
           commands:
             - npm run build
       artifacts:
-        baseDirectory: .next
+        baseDirectory: out
         files:
-            - '**/*'
+          - '**/*'
       cache:
         paths:
-          - node_modules/**/*
-    appRoot: /frontend
+          - node_modules/**/*  
