@@ -7,7 +7,7 @@ const FormButton = () => {
     });
 
     return (
-        <div className="w-[48%]">
+        <div className="md:w-[48%] w-full">
             <div className="m-auto w-fit">
                 <p className="text-[100px]">Login</p>
                 <button
