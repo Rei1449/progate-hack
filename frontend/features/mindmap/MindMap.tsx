@@ -11,9 +11,12 @@ export default function MindMap() {
         <Drawer>
             <DrawerTrigger className="ml-5 flex items-center">
                 <img src="./mind.svg" className="w-[20px]" />
-                <DrawerTitle className="ml-2">MindMap</DrawerTitle>
+                <p className=" ml-2 text-gray-300">MindMap</p>
             </DrawerTrigger>
             <DrawerContent className="min-h-[300px]">
+                <DrawerTitle className="font-bold text-2xl ml-2 text-gray-300">
+                    MindMap
+                </DrawerTitle>
                 <form>
                     <input />
                 </form>

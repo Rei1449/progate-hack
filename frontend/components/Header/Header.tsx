@@ -1,3 +1,4 @@
+"use client";
 import dynamic from "next/dynamic";
 import React from "react";
 
@@ -7,12 +8,16 @@ const Clock = dynamic(() => import("@/features/clock/Clock"), {
 import Meeting from "@/features/meeting/Meeting";
 import Reading from "@/features/reading/Reading";
 import MindMap from "@/features/mindmap/MindMap";
+import AuthView from "@/features/auth/AuthView";
 
 export default function Header() {
     return (
         <header className=" w-screen top-0">
-            <div className="flex items-center justify-between p-5 w-[80%] m-auto border-b border-gray-800">
-                <Clock />
+            <div className="flex items-center justify-between p-5 w-[85%] m-auto border-b border-gray-800">
+                <div className="flex items-center">
+                    <Clock />
+                    <AuthView />
+                </div>
                 <nav>
                     <ul className="flex justify-between relative z-40">
                         <li className="ml-5">
