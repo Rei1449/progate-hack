@@ -162,66 +162,171 @@ async fn qiita() -> HttpResponse {
         response_data.body_code,
         42
     );
-    HttpResponse::Ok()
-        .content_type("application/json")
-        .body(serde_json::json!({ "text": response_data.body_text }).to_string())
+
+    
+    let audio_text = response_data.body_text.replace("\r\n", "").replace("```", "").replace("\n", "").replace("#", "");
+
+
+    // テキストを100文字ずつに分割
+    let chunks = split_text_length(&audio_text , 50);
+
+    // wavファイルのバイナリデータを格納するためのバッファ
+    let mut audio_binary: Vec<u8> = Vec::new();
+    let mut header: Vec<u8> = Vec::with_capacity(44);
+    let mut first_iteration = true;
+
+    for chunk in chunks {
+        let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+        let response = client
+            .post(url)
+            .send()
+            .await
+            .expect("Failed to send voicevox audio_query request");
+
+        let synthesis_response = client
+            .post("http://voicevox:50021/synthesis?speaker=3")
+            .header("Content-Type", "application/json")
+            .header("Accept", "audio/wav")
+            .body(response)
+            .send()
+            .await
+            .expect("Failed to send request");
+
+        let audio_data = synthesis_response.bytes().await.unwrap();
+
+        if first_iteration {
+            // 最初のデータでヘッダーを取得し、オーディオデータのヘッダー部分をスキップ
+            header.extend_from_slice(&audio_data.to_vec()[0..44]);
+            audio_binary.extend_from_slice(&audio_data.to_vec()[44..]);
+            first_iteration = false;
+        } else {
+            // 2回目以降はオーディオデータのみを追加
+            audio_binary.extend_from_slice(&audio_data.to_vec()[44..]);
+        }
+    }
+
+    // ファイルサイズとデータサイズを更新
+    let data_size = audio_binary.len() as u32;
+    let file_size = 36 + data_size; 
+
+    header[4..8].copy_from_slice(&file_size.to_le_bytes());
+    header[40..44].copy_from_slice(&data_size.to_le_bytes());
+
+    let mut buffer: Vec<u8> = Vec::new();
+    buffer.extend_from_slice(&header);
+    buffer.extend_from_slice(&audio_binary);
+
+    // HTTPレスポンスを返す
+    HttpResponse::Ok().content_type("audio/wav").body(buffer)
 }
 
-#[post("/vv")]
+fn split_text_length(text: &String, length: usize) -> Vec<String> {
+    text.chars()
+        .collect::<Vec<char>>() 
+        .chunks(length)
+        .map(|chunk| chunk.iter().collect())
+        .collect()
+}
+
+// バイナリ形式でフロントに音声データを渡せた！
+#[get("/vv")]
 async fn vv_test() -> HttpResponse {
     println!("vv");
     let client = Client::new();
-    let url = "http://localhost:50021/audio_query?text=qqq&speaker=3";
-    let response = match client
+    let url = "http://voicevox:50021/audio_query?text=ずんだもんなのだ&speaker=3";
+    let response = client
         .post(url)
         .header("Content-Type", "application/json")
         .send()
         .await
-    {
-        Ok(resp) => match resp.text().await {
-            Ok(body) => body,
-            Err(e) => format!("Failed to read response body: {:?}", e),
-        },
-        Err(e) => format!("Failed to send request: {:?}", e),
-    };
+        .expect("Failed to send request");
+    
+    let synthesis_url = "http://voicevox:50021/synthesis?speaker=3";
+    
+    let synthesis_response = client
+        .post(synthesis_url)
+        .header("Content-Type", "application/json")
+        .header("Accept", "audio/wav")
+        .body(response)
+        .send()
+        .await
+        .expect("Failed to send request");
+    
+    println!("{:?}",synthesis_response);
 
-    println!("Response: {:?}", response);
+    let audio_data = synthesis_response.bytes().await.unwrap();
+
+    println!("{:?}",audio_data.to_vec());
 
     // HTTPレスポンスを返す
-    HttpResponse::Ok().content_type("application/json").body(format!(r#"{{"response": "{}"}}"#, response))
+    HttpResponse::Ok().content_type("audio/wav").body(audio_data)
+    // HttpResponse::Ok().content_type("application/json").body(format!(r#"{{"response": "{:?}"}}"#, audio_data))
+
+
     // println!("{:?}",response);
     // println!("test_voicevox");
     // HttpResponse::Ok().content_type("application/json").body(r#"{"return":"ok"}"#)
     // test_voicevox().await;
     // HttpResponse::Ok().content_type("application/json").body(r#"{"return":"ok"}"#)
 }
-#[post("/voice")]
-async fn voice() -> HttpResponse {
-    let mut headers = HeaderMap::new();
-    headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-    // map.insert("accept", "audio/wav");
-    // map.insert("Content-Type", "application/json");
-    let client = Client::new();
-    let url = "http://localhost:50021/synthesis?speaker=3";
-    let response = match client
-        .post(url)
-        .headers(headers)
-        .send()
-        .await
-    {
-        Ok(resp) => match resp.text().await {
-            Ok(body) => body,
-            Err(e) => format!("Failed to read response body: {:?}", e),
-        },
-        Err(e) => format!("Failed to send request: {:?}", e),
-    };
 
-    println!("Response: {:?}", response);
+// バイナリ形式を結合させてフロントに返せた！
+#[get("/voice")]
+async fn voice() -> HttpResponse {
+    let client = Client::new();
+    let audio_text = "ずんだもんなのだ".to_string();
+    let chunks = split_text_length(&audio_text, 5);
+
+    // wavファイルのバイナリデータを格納するためのバッファ
+    let mut audio_binary: Vec<u8> = Vec::new();
+    let mut header: Vec<u8> = Vec::with_capacity(44);
+    let mut first_iteration = true;
+
+    for chunk in chunks {
+        let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+        let response = client
+            .post(url)
+            .send()
+            .await
+            .expect("Failed to send voicevox audio_query request");
+
+        let synthesis_response = client
+            .post("http://voicevox:50021/synthesis?speaker=3")
+            .header("Content-Type", "application/json")
+            .header("Accept", "audio/wav")
+            .body(response)
+            .send()
+            .await
+            .expect("Failed to send request");
+
+        let audio_data = synthesis_response.bytes().await.unwrap();
+
+        if first_iteration {
+            // 最初のデータでヘッダーを取得し、オーディオデータのヘッダー部分をスキップ
+            header.extend_from_slice(&audio_data.to_vec()[0..44]);
+            audio_binary.extend_from_slice(&audio_data.to_vec()[44..]);
+            first_iteration = false;
+        } else {
+            // 2回目以降はオーディオデータのみを追加
+            audio_binary.extend_from_slice(&audio_data.to_vec()[44..]);
+        }
+    }
+
+    // ファイルサイズとデータサイズを更新
+    let data_size = audio_binary.len() as u32;
+    let file_size = 36 + data_size; 
+
+    header[4..8].copy_from_slice(&file_size.to_le_bytes());
+    header[40..44].copy_from_slice(&data_size.to_le_bytes());
+
+    let mut buffer: Vec<u8> = Vec::new();
+    buffer.extend_from_slice(&header);
+    buffer.extend_from_slice(&audio_binary);
 
     // HTTPレスポンスを返す
-    HttpResponse::Ok().content_type("application/json").body(format!(r#"{{"response": "{}"}}"#, response))
-
+    HttpResponse::Ok().content_type("audio/wav").body(buffer)
 }
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
