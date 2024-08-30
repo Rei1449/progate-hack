@@ -1,13 +1,28 @@
 use std::{backtrace, str::Chars, panic};
 
+use std::env;
+use actix_web::dev::Response;
 use actix_web::http::header::{Accept, ACCEPT};
 use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
+use api::tagapi::get_tag;
+// use backend::models;
+use diesel::{insert_into, PgConnection, RunQueryDsl};
+// use log::info;
 // use actix_web::{actix, client};
 use reqwest::Client;
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use serde_json::Value;
 use actix_cors::Cors;
 use std::collections::HashMap;
+
+#[macro_use]
+extern crate diesel;
+
+// mod db;
+mod api;
+mod models;
+mod schema;
+
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub struct ReturnCheckBody {
@@ -98,6 +113,13 @@ async fn hello() -> impl Responder {
 async fn manual_hello() -> impl Responder {
     HttpResponse::Ok().body("Hey there!")
 }
+
+// #[post("/qiita")]
+// async fn post_qiita() -> HttpResponse {
+//     let client = Client::new(); // 1
+//     let url = "https://qiita.com/api/v2/items/0e2a5a3d047e6b08c811";
+
+// }
 
 #[get("/qiita")]
 // async fn qiita()  -> Result<ReturnCheckBody> {
@@ -336,17 +358,24 @@ async fn main() -> std::io::Result<()> {
     //     eprintln!("Backtrace: {:?}", backtrace);
     // }));
 
+    use crate::api::tagapi::save_tag;
+
     HttpServer::new(|| {
 
         let cors = Cors::permissive();
+        // let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        // let pool = db::establish_connection_pool(&database_url);
 
         App::new()
             .wrap(cors)
+            // .app_data(web::Data::new(pool.clone()))
             .service(hello)
             .service(qiita)
             .service(vv_test)
             .service(voice)
             .route("/hey", web::get().to(manual_hello))
+            .service(save_tag)
+            .service(get_tag)
     })
     .bind(("0.0.0.0", 8080))?
     .run()
