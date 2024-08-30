@@ -1,11 +1,7 @@
-import { getProviders, signIn } from "next-auth/react";
+"use client";
+import { signIn } from "next-auth/react";
 
 const FormButton = () => {
-    const providers = getProviders().then((res) => {
-        console.log(res);
-        return res;
-    });
-
     return (
         <div className="md:w-[48%] w-full">
             <div className="m-auto w-fit">

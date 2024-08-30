@@ -9,6 +9,7 @@ import Meeting from "@/features/meeting/Meeting";
 import Reading from "@/features/reading/Reading";
 import MindMap from "@/features/mindmap/MindMap";
 import AuthView from "@/features/auth/AuthView";
+import { NextAuthProvider } from "@/lib/next-auth/provider";
 
 export default function Header() {
     return (
@@ -16,7 +17,9 @@ export default function Header() {
             <div className="flex items-center justify-between p-5 md:w-[85%] w-[95%] m-auto border-b border-gray-800">
                 <div className="flex items-center">
                     <Clock />
-                    <AuthView />
+                    <NextAuthProvider>
+                        <AuthView />
+                    </NextAuthProvider>
                 </div>
                 <nav>
                     <ul className="flex justify-between relative z-40">

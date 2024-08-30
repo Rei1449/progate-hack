@@ -1,5 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
+import { NextAuthProvider } from "@/lib/next-auth/provider";
 
 const Timer = dynamic(() => import("@/features/timer/Timer"), {
     ssr: false,
@@ -7,8 +8,10 @@ const Timer = dynamic(() => import("@/features/timer/Timer"), {
 
 export default function Home() {
     return (
-        <main className="relative w-screen max-h-screen">
-            <Timer />
-        </main>
+        <NextAuthProvider>
+            <main className="relative w-screen max-h-screen">
+                <Timer />
+            </main>
+        </NextAuthProvider>
     );
 }

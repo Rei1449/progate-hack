@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header/Header";
-import { NextAuthProvider } from "@/lib/next-auth/provider";
 
 export const metadata: Metadata = {
     title: "Top",
@@ -26,10 +25,8 @@ export default function RootLayout({
                 ></link>
             </head>
             <body className="w-screen max-h-screen font-origin bg-original bg-[#181818] text-white">
-                <NextAuthProvider>
-                    <Header />
-                    {children}
-                </NextAuthProvider>
+                <Header />
+                {children}
             </body>
         </html>
     );
