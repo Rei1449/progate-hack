@@ -8,8 +8,6 @@ applications:
         build:
           commands:
             - npm run build
-                build:
-                    commands: [""]
       artifacts:
         baseDirectory: .next
         files:
