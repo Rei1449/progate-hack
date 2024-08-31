@@ -6,7 +6,7 @@ import { Adapter } from "next-auth/adapters";
 import Google from "next-auth/providers/google";
 
 export const nextAuthOptions: NextAuthOptions = {
-    debug: false,
+    debug: true,
     providers: [
         Github({
             clientId: process.env.GITHUB_CLIENT_ID!,
