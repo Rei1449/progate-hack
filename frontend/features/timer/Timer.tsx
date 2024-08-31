@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTimer } from "./hooks/useTimer";
 import TimerLog from "./components/TimerLog";
 import TimerCategories from "./components/TimerCategories";
@@ -11,9 +11,26 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer";
 import { TimerChart } from "./components/TimerChart";
-import TImercategoryForm from "./components/TImercategoryForm";
+import TImerTagForm from "./components/TImercategoryForm";
+import { useSession } from "next-auth/react";
+
+import { DefaultSession } from "next-auth";
+
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: string;
+        } & DefaultSession["user"];
+    }
+}
+export type Tag = {
+    user_id: string;
+    id: number;
+    title: string;
+};
 
 export default function Timer() {
+    const { data } = useSession();
     const {
         startTimer,
         pauseTimer,
@@ -24,21 +41,74 @@ export default function Timer() {
         isActive,
         isPaused,
     } = useTimer();
-    const [viewCategory, setViewCategory] = useState("todo");
-    const handleClickCategory = (category: string) => {
-        setViewCategory(category);
+
+    const [viewTag, setViewTag] = useState<Tag>();
+    const handleClickTag = (tag: Tag) => {
+        setSendTag(tag);
+        setViewTag(tag);
         if (seconds > 0 && confirm("現在の作業を完了しますか？")) {
             stopTimer();
+            postTime();
         }
     };
+
+    //post time
+    const [sendtag, setSendTag] = useState<Tag>();
+    const postTime = async () => {
+        if (!data?.user.id) {
+            return;
+        }
+        const sendData = {
+            user_id: data?.user.id,
+            time_second: seconds,
+            tag_id: sendtag?.id,
+        };
+        const res = await fetch("http://localhost:8080/time/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sendData),
+        });
+        if (res.ok) {
+            const data = await res.json();
+            console.log(data);
+        }
+    };
+    const [tags, setTags] = useState<Tag[]>([]);
+
+    const getTags = async () => {
+        const userId = data?.user.id;
+        const res = await fetch("http://localhost:8080/tag/all", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            // body: JSON.stringify({ user_id: userId }),
+        });
+        if (res.ok) {
+            const data = await res.json();
+            console.log(data.text);
+            const string = data.text;
+            const parsedData = JSON.parse(string);
+            console.log(parsedData);
+            setTags(parsedData);
+        }
+    };
+    useEffect(() => {
+        getTags();
+    }, []);
     return (
         <>
             <div className="flex flex-row-reverse flex-wrap justify-between items-center md:w-[85%] w-[90%] mt-2 m-auto">
-                <TImercategoryForm />
-                <TimerCategories handleClickCategory={handleClickCategory} />
+                <TImerTagForm setTags={setTags} />
+                <TimerCategories
+                    handleClickCategory={handleClickTag}
+                    tags={tags}
+                />
             </div>
             <p className="text-2xl xl:text-6xl lg:text-4xl w-[85%] m-auto mt-10 ">
-                {viewCategory}
+                {viewTag?.title}
             </p>
             <div className="absolute mt-5 w-[80%] m-auto right-0 left-0 flex flex-row-reverse flex-wrap md:flex-nowrap justify-between items-start">
                 <div className="md:w-[70%] w-full lg:ml-10 md:ml-5 ml-0">
@@ -72,7 +142,10 @@ export default function Timer() {
                         )}
                         {isActive && (
                             <button
-                                onClick={stopTimer}
+                                onClick={() => {
+                                    stopTimer();
+                                    postTime();
+                                }}
                                 className="hover:bg-[#08051d] hover:duration-300 rounded-md bg-[#1a1157] md:w-[120px] w-[80px] md:p-5 p-2 mt-5"
                             >
                                 Done!!!
@@ -81,7 +154,7 @@ export default function Timer() {
                     </div>
                 </div>
                 <div className="md:w-[30%] w-full">
-                    <TimerLog category={viewCategory} />
+                    <TimerLog tag={viewTag} />
                 </div>
             </div>
             <Drawer>

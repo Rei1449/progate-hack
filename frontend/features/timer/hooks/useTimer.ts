@@ -12,7 +12,6 @@ export const useTimer = () => {
                 setSeconds((prevSeconds) => prevSeconds + 1);
             }, 1000);
         }
-
         return () => clearInterval(intervalId);
     }, [isActive, isPaused]);
 
