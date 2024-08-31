@@ -5,7 +5,7 @@ use std::{str::Chars};
 use actix_web::http::header::{Accept, ACCEPT};
 use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
 use api::tagapi::{save_tag, get_tag, get_tag_all};
-use api::timeapi::{save_time, get_time, get_time_all};
+use api::timeapi::{get_time, get_time_all, get_today_time, save_time};
 use api::roomapi::{save_room, get_room_all};
 use api::voiceapi::save_qiita;
 // use api::timeapi::save_time;
@@ -375,6 +375,7 @@ async fn main() -> std::io::Result<()> {
             .service(save_time)
             .service(get_time)
             .service(get_time_all)
+            .service(get_today_time)
             .service(save_room)
             .service(get_room_all)
             .service(save_qiita)

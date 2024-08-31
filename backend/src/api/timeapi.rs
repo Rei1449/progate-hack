@@ -13,12 +13,6 @@ use diesel::pg::PgConnection;
 
 use dotenv::dotenv;
 
-// use actix_web::{ Data };
-// use crate::database::Pool;
-
-// use diesel::pg::PgConnection;
-// use diesel::r2d2::{self, ConnectionManager};
-// pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -69,11 +63,6 @@ pub async fn get_time(info: web::Json<Info>) -> Result<HttpResponse> {
         .filter(user_id.eq(info.user_id.clone()))
         .load(&mut connection)
         .unwrap();
-        // .optional();
-
-        // for d in data{
-        //     println!("{:?}",d);
-        // }
     
     let json_string = serde_json::to_string(&data).unwrap();
 
@@ -81,7 +70,7 @@ pub async fn get_time(info: web::Json<Info>) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(
-            serde_json::json!({ "text": json_string })
+            serde_json::json!( json_string )
             .to_string()
         )
     )
@@ -103,6 +92,37 @@ pub async fn get_time_all() -> Result<HttpResponse> {
         .content_type("application/json")
         .body(
             serde_json::json!({ "text": json_string })
+            .to_string()
+        )
+    )
+}
+#[get("time/today/{userid}")]
+pub async fn get_today_time(path: web::Path<String>) -> Result<HttpResponse> {
+    use crate::schema::times::dsl::*;
+    let mut connection = db_connect();
+    extern crate serde_json;
+    use chrono::{Datelike, TimeZone, Utc};
+    use chrono_tz::{Asia::Tokyo};
+
+    let utc = Utc::now().naive_utc();
+    let jst = Tokyo.from_utc_datetime(&utc);
+    let today_start =  Tokyo.ymd(jst.year(), jst.month(), jst.day()).and_hms(0, 0, 0);
+    let userid = path.into_inner();
+
+    println!("{}",jst);
+    println!("{}",today_start);
+
+    let data:Vec<TimeResponse> = times
+    // .select((id,time_second,user_id,tag_id,created_at))
+    .filter(created_at.gt(today_start))
+    .filter(user_id.eq(userid))
+    .load(&mut connection)
+    .unwrap();
+
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(
+            serde_json::json!( data )
             .to_string()
         )
     )
