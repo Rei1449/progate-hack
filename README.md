@@ -5,6 +5,10 @@ docker compose up -d
 ```
 ## Next.jsアーキテクト　ルール
 
+app
+- ルートファイル
+- ロジックは書かない！！
+
 components
 - shadcn/uiコンポーネント
 - 汎用かつロジックのないコンポーネント
