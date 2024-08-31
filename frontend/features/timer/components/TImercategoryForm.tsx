@@ -10,8 +10,12 @@ export default function TImercategoryForm({
     const { data } = useSession();
     const [tag, setTag] = useState("");
     const postTag = async (e: React.FormEvent<HTMLFormElement>) => {
+        if (!data?.user.id) {
+            return;
+        }
         e.preventDefault();
         const userId = data?.user.id;
+        console.log("userId", userId);
         const res = await fetch(
             "https://kzaecka7sp.us-west-2.awsapprunner.com/tag/create",
             {
@@ -24,11 +28,12 @@ export default function TImercategoryForm({
         );
         if (res.ok) {
             const data = await res.json();
-            console.log(data);
+            console.log("data?", data);
             setTag("");
-            // setTags((prev) => {
-            //     return [...prev, tag];
-            // });
+            console.log("sendtext", data.text);
+            setTags((prev) => {
+                return [...prev, data.text];
+            });
         }
     };
     const handleChangeTag = (e: React.ChangeEvent<HTMLInputElement>) => {
