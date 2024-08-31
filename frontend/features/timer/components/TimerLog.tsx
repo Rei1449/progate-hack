@@ -1,6 +1,7 @@
 import React from "react";
+import { Tag } from "../Timer";
 
-export default function TimerLog({ category }: { category: string }) {
+export default function TimerLog({ tag }: { tag: Tag | undefined }) {
     const dummuyData = [
         { date: "08/30", time: 2000 },
         { date: "08/30", time: 2500 },
