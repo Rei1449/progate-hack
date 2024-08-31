@@ -5,7 +5,7 @@ use actix_web::{get, post, web, Result};
 // use std::env;
 use diesel::prelude::*;
 
-use crate::models::tagmodel::*;
+use crate::models::timemodel::*;
 
 use diesel::Connection;
 
@@ -20,6 +20,7 @@ use dotenv::dotenv;
 // use diesel::r2d2::{self, ConnectionManager};
 // pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 use serde::Deserialize;
+
 #[derive(Deserialize)]
 struct Info {
     user_id: String,
@@ -36,26 +37,28 @@ fn db_connect() -> PgConnection {
 
 }
 
-#[post("/tag/create")]
-pub async fn save_tag(tag: web::Json<CreateTag>) -> Result<HttpResponse> {
-    use crate::schema::tags::dsl::*;
+#[post("/time/create")]
+pub async fn save_time(time: web::Json<CreateTime>) -> Result<HttpResponse> {
+    use crate::schema::times::dsl::*;
     let mut connection = db_connect();
 
-    diesel::insert_into(tags)
-        .values(&tag.into_inner())
+    diesel::insert_into(times)
+        .values(&time.into_inner())
         .execute(& mut connection)
-        .expect("Error inserting new tag");
+        .expect("Error inserting new time");
 
-    Ok(HttpResponse::Ok().json("Tag Create Success."))
+    Ok(HttpResponse::Ok().json("Time Create Success."))
 
 }
-#[get("/tag")]
-pub async fn get_tag(info: web::Json<Info>) -> Result<HttpResponse> {
-    use crate::schema::tags::dsl::*;
+#[get("/time")]
+pub async fn get_time(info: web::Json<Info>) -> Result<HttpResponse> {
+    use crate::schema::times::dsl::*;;
     let mut connection = db_connect();
 
-    let data:Vec<TagResponse> = tags
-        // .select((id,title,user_id))
+    println!("{}",info.user_id);
+
+    let data:Vec<TimeResponse> = times
+        // .select((id,time_second,user_id,tag_id,created_at))
         .filter(user_id.eq(info.user_id.clone()))
         .load(&mut connection)
         .unwrap();
@@ -76,20 +79,15 @@ pub async fn get_tag(info: web::Json<Info>) -> Result<HttpResponse> {
         )
     )
 }
-#[get("/tag/all")]
-pub async fn get_tag_all() -> Result<HttpResponse> {
-    use crate::schema::tags::dsl::*;
+#[get("/time/all")]
+pub async fn get_time_all() -> Result<HttpResponse> {
+    use crate::schema::times::dsl::*;;
     let mut connection = db_connect();
 
-    let data:Vec<TagResponse> = tags
-        .select((id,title,user_id))
+    let data:Vec<TimeResponse> = times
+        .select((id,time_second,user_id,tag_id,created_at))
         .load(&mut connection)
         .unwrap();
-        // .optional();
-
-        // for d in data{
-        //     println!("{:?}",d);
-        // }
     
     let json_string = serde_json::to_string(&data).unwrap();
 

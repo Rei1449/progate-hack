@@ -13,10 +13,10 @@ diesel::table! {
 diesel::table! {
     times (id) {
         id -> Int4,
-        time -> Time,
+        time_second -> Int4,
         user_id -> Text,
         tag_id -> Int4,
-        // created_at -> Timestamp,
+        created_at -> Timestamp,
         // updated_at -> Timestamp,
     }
 }
