@@ -44,13 +44,16 @@ export default function Meeting() {
     };
     const postRoom = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const res = await fetch("http://localhost:8080/room/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ name: sendRoom }),
-        });
+        const res = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/room/create",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name: sendRoom }),
+            }
+        );
         if (res.ok) {
             const data: BackRoom = await res.json();
             console.log("maked room", data);
@@ -91,7 +94,7 @@ export default function Meeting() {
                 <div className="h-full overflow-scroll pb-10">
                     {rooms?.map((room: Room, index: number) => (
                         <div
-                            key={`${room.name}${index}`}
+                            key={index}
                             className="m-auto mt-5 mb-0 border-b border-gray-700 md:w-[60%] w-[90%]"
                         >
                             <Dialog>

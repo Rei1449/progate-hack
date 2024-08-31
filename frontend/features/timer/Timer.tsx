@@ -65,13 +65,16 @@ export default function Timer() {
             time_second: seconds,
             tag_id: sendtag?.id,
         };
-        const res = await fetch("http://localhost:8080/time/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(sendData),
-        });
+        const res = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/time/create",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(sendData),
+            }
+        );
         if (res.ok) {
             const data = await res.json();
             console.log(data);
