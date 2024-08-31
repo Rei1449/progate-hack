@@ -224,7 +224,12 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
     HttpResponse::Ok().content_type("audio/wav").body(buffer) // ここreturn_voice_data.~~~の形で書きたい
 }
 
+#[get("/testbinary")]
+async fn testbinary() -> HttpResponse {
+    let mut connection = db_connect();
+    let data:Vec<VoiceResponse> = voices.load(& mut connection).unwrap();
 
+    let first_record = data.first().unwrap();
 
-
-
+    HttpResponse::Ok().content_type("audio/wav").body(first_record.voice_data.clone())
+}
