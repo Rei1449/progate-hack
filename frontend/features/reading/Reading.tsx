@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/drawer";
 
 export default function Reading() {
+    const [voiceURL, setVoiceURL] = useState<string>();
     const [sendUrl, setSendUrl] = useState<string>("");
 
     const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -15,18 +16,32 @@ export default function Reading() {
     };
     const handleUrlSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const sendData = {
-            url: sendUrl,
-            user_id: 1,
-        };
-        const res = await fetch("http://localhost:8080/qiita");
+        // const sendData = {
+        //     url: sendUrl,
+        //     user_id: 1,
+        // };
+        // const res = await fetch("http://localhost:8080/qiita");
 
-        if (res.ok) {
-            const data = await res.json();
-            console.log("res data", data);
-        } else {
-            console.log("fail");
-        }
+        // if (res.ok) {
+        //     const data = await res.json();
+        //     console.log("res data", data);
+        // } else {
+        //     console.log("fail");
+        // }
+        const synthesis_response = await fetch("http://localhost:8080/qiita");
+
+        const synthesis_response_buf = await synthesis_response.arrayBuffer();
+
+        const blob = new Blob([synthesis_response_buf], { type: "audio/wav" });
+        // BlobをURLに変換
+        const url = URL.createObjectURL(blob);
+        setVoiceURL(url);
+        // const audio = new Audio(url);
+        // audio.play();
+    };
+    const handleClickURL = () => {
+        const audio = new Audio(voiceURL);
+        audio.play();
     };
     return (
         <Drawer>
@@ -49,6 +64,15 @@ export default function Reading() {
                         読み上げ！
                     </button>
                 </form>
+                {voiceURL ? (
+                    <>
+                        <button onClick={handleClickURL} className="text-white">
+                            再生
+                        </button>
+                    </>
+                ) : (
+                    <>準備中</>
+                )}
             </DrawerContent>
         </Drawer>
     );
