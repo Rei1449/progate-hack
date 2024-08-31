@@ -188,7 +188,7 @@ async fn manual_hello() -> impl Responder {
 //         42
 //     );
 
-    
+
 //     let audio_text = response_data.body_text.replace("\r\n", "").replace("```", "").replace("\n", "").replace("#", "");
 
 
@@ -244,6 +244,7 @@ async fn manual_hello() -> impl Responder {
 //     // HTTPレスポンスを返す
 //     HttpResponse::Ok().content_type("audio/wav").body(buffer)
 // }
+
 
 fn split_text_length(text: &String, length: usize) -> Vec<String> {
     text.chars()

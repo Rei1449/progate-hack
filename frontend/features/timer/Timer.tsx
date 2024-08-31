@@ -63,13 +63,16 @@ export default function Timer() {
             time_second: seconds,
             tag_id: sendtag?.id,
         };
-        const res = await fetch("http://localhost:8080/time/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(sendData),
-        });
+        const res = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/time/create",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(sendData),
+            }
+        );
         if (res.ok) {
             const data = await res.json();
             console.log(data);
@@ -79,13 +82,16 @@ export default function Timer() {
 
     const getTags = async () => {
         const userId = data?.user.id;
-        const res = await fetch("http://localhost:8080/tag/all", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            // body: JSON.stringify({ user_id: userId }),
-        });
+        const res = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/tag",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ user_id: userId }),
+            }
+        );
         if (res.ok) {
             const data = await res.json();
             console.log(data.text);
@@ -118,7 +124,13 @@ export default function Timer() {
                     <div className="flex justify-between border-t border-gray-800">
                         {!isActive && !isPaused && (
                             <button
-                                onClick={startTimer}
+                                onClick={() => {
+                                    if (!viewTag) {
+                                        alert("タスクを選択してください");
+                                        return;
+                                    }
+                                    startTimer();
+                                }}
                                 className="hover:opacity-80 hover:duration-300 rounded-md bg-[#333333] md:w-[120px] w-[80px] md:p-5 p-2 mt-5"
                             >
                                 Start

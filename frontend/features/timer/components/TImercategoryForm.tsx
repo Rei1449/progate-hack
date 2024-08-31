@@ -12,13 +12,16 @@ export default function TImercategoryForm({
     const postTag = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const userId = data?.user.id;
-        const res = await fetch("http://localhost:8080/tag/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ title: tag, user_id: userId }),
-        });
+        const res = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/tag/create",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ title: tag, user_id: userId }),
+            }
+        );
         if (res.ok) {
             const data = await res.json();
             console.log(data);
