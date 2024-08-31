@@ -29,10 +29,18 @@ export type Tag = {
     title: string;
 };
 
+export type TodayData = {
+    created_at: string;
+    id: number;
+    tag_id: number;
+    time_second: number;
+    user_id: string;
+};
+
 export default function Timer() {
     const { data } = useSession();
     const userId = data?.user.id;
-    console.log("userid", userId);
+
     const {
         startTimer,
         pauseTimer,
@@ -45,9 +53,17 @@ export default function Timer() {
     } = useTimer();
 
     const [viewTag, setViewTag] = useState<Tag>();
-    const handleClickTag = (tag: Tag) => {
-        setSendTag(tag);
+
+    const [propTodayData, setPropTodayData] = useState<TodayData[]>();
+    const selectTagTodaydata = (id: number) => {
+        return todayData?.filter((item) => item.tag_id === id);
+    };
+    const handleClickTag = (tag: Tag, id: number) => {
         setViewTag(tag);
+        console.log("クリックされたid", id);
+        const data = selectTagTodaydata(id);
+        setPropTodayData(data);
+        setSendTag(tag);
         if (seconds > 0 && confirm("現在の作業を完了しますか？")) {
             stopTimer();
             postTime();
@@ -65,19 +81,16 @@ export default function Timer() {
             time_second: seconds,
             tag_id: sendtag?.id,
         };
-        const res = await fetch(
-            "https://kzaecka7sp.us-west-2.awsapprunner.com/time/create",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(sendData),
-            }
-        );
+        const res = await fetch("http://localhost:8080/time/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sendData),
+        });
         if (res.ok) {
             const data = await res.json();
-            console.log(data);
+            console.log("res timer", data);
         }
     };
     const [tags, setTags] = useState<Tag[]>([]);
@@ -93,7 +106,7 @@ export default function Timer() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ user_id: userId }),
+                body: JSON.stringify({ user_id: data?.user.id }),
             }
         );
         if (res.ok) {
@@ -107,7 +120,17 @@ export default function Timer() {
     };
     useEffect(() => {
         getTags();
+        getTodayTime();
     }, [data?.user.id]);
+    const [todayData, setTodayData] = useState<TodayData[]>();
+    const getTodayTime = async () => {
+        const res = await fetch(`http://localhost:8080/time/today/${userId}`);
+        if (res.ok) {
+            const data = await res.json();
+            console.log("time today data", data);
+            setTodayData(data);
+        }
+    };
     return (
         <>
             <div className="flex flex-row-reverse flex-wrap justify-between items-center md:w-[85%] w-[90%] mt-2 m-auto">
@@ -170,7 +193,7 @@ export default function Timer() {
                     </div>
                 </div>
                 <div className="md:w-[30%] w-full">
-                    <TimerLog tag={viewTag} />
+                    <TimerLog propTodayData={propTodayData} />
                 </div>
             </div>
             <Drawer>

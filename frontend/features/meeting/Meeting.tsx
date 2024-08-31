@@ -25,7 +25,9 @@ type Room = {
 export default function Meeting() {
     const [rooms, setRooms] = useState<Room[]>([]);
     const getRooms = async () => {
-        const res = await fetch("http://localhost:8080/room/all");
+        const res = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/room/all"
+        );
         if (res.ok) {
             const data = await res.json();
             console.log("room", data);

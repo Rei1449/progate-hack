@@ -1,13 +1,12 @@
 "use client";
-import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Tag } from "../Timer";
 
 export default function TimerCategories({
     handleClickCategory,
     tags,
 }: {
-    handleClickCategory: (category: Tag) => void;
+    handleClickCategory: (category: Tag, id: number) => void;
     tags: Tag[];
 }) {
     return (
@@ -20,7 +19,7 @@ export default function TimerCategories({
                 <div
                     className="whitespace-nowrap bg-gray-800 py-1 px-5 rounded-md ml-[10px] cursor-pointer hover:duration-300 hover:bg-gray-700"
                     key={item.id}
-                    onClick={() => handleClickCategory(item)}
+                    onClick={() => handleClickCategory(item, item.id)}
                 >
                     {item.title}
                 </div>
