@@ -12,7 +12,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import MeetingVideo from "./components/MeetingVideo";
+// import MeetingVideo from "./components/MeetingVideo";
+import dynamic from "next/dynamic";
+const MeetingVideo = dynamic(() => import("./components/MeetingVideo"));
 
 type BackRoom = {
     text: Room;

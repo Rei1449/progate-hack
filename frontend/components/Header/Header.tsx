@@ -5,10 +5,13 @@ import React from "react";
 const Clock = dynamic(() => import("@/features/clock/Clock"), {
     ssr: false,
 });
-import Meeting from "@/features/meeting/Meeting";
-import Reading from "@/features/reading/Reading";
-import MindMap from "@/features/mindmap/MindMap";
-import AuthView from "@/features/auth/AuthView";
+// import Meeting from "@/features/meeting/Meeting";
+// import Reading from "@/features/reading/Reading";
+
+// import AuthView from "@/features/auth/AuthView";
+const Meeting = dynamic(() => import("@/features/meeting/Meeting"));
+const Reading = dynamic(() => import("@/features/reading/Reading"));
+const AuthView = dynamic(() => import("@/features/auth/AuthView"));
 import { NextAuthProvider } from "@/lib/next-auth/provider";
 
 export default function Header() {
@@ -28,9 +31,6 @@ export default function Header() {
                         </li>
                         <li className="ml-5">
                             <Meeting />
-                        </li>
-                        <li className="ml-5">
-                            <MindMap />
                         </li>
                     </ul>
                 </nav>
