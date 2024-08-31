@@ -16,8 +16,24 @@ diesel::table! {
         time_second -> Int4,
         user_id -> Text,
         tag_id -> Int4,
-        created_at -> Timestamp,
+        created_at -> Timestamptz,
         // updated_at -> Timestamp,
+    }
+}
+
+diesel::table! {
+    rooms (id) {
+        id -> Int4,
+        name -> Text,
+    }
+}
+
+diesel::table! {
+    voices (id) {
+        id -> Int4,
+        voice_data -> Bytea,
+        qiita_id -> Text,
+        title -> Text,
     }
 }
 
@@ -26,4 +42,6 @@ diesel::joinable!(times -> tags (tag_id));
 diesel::allow_tables_to_appear_in_same_query!(
     tags,
     times,
+    rooms,
+    voices
 );

@@ -42,15 +42,22 @@ pub async fn save_time(time: web::Json<CreateTime>) -> Result<HttpResponse> {
     use crate::schema::times::dsl::*;
     let mut connection = db_connect();
 
-    diesel::insert_into(times)
+    let time_data = diesel::insert_into(times)
         .values(&time.into_inner())
-        .execute(& mut connection)
+        .get_result::<TimeResponse>(& mut connection)
+        // .execute(& mut connection)
         .expect("Error inserting new time");
 
-    Ok(HttpResponse::Ok().json("Time Create Success."))
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(
+            serde_json::json!({ "text": time_data } )
+            .to_string()
+        )
+    )
 
 }
-#[get("/time")]
+#[post("/time")]
 pub async fn get_time(info: web::Json<Info>) -> Result<HttpResponse> {
     use crate::schema::times::dsl::*;;
     let mut connection = db_connect();

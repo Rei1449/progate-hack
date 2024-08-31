@@ -23,6 +23,8 @@ services:
     volumes:
       - ./backend:/app/backend
     tty: true
+    environment:
+      - backend:${DATABASE_URL}
 
   voicevox:
     container_name: progate_voicevox
