@@ -3,8 +3,8 @@ import "./globals.css";
 import Header from "@/components/Header/Header";
 
 export const metadata: Metadata = {
-    title: "Top",
-    description: "Topページ",
+    title: "Time",
+    description: "Time",
 };
 
 export default function RootLayout({

@@ -6,33 +6,34 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer";
+import { useSession } from "next-auth/react";
 
 export default function Reading() {
-    const [voiceURL, setVoiceURL] = useState<HTMLAudioElement>();
+    const { data } = useSession();
+    const [voiceURL, setVoiceURL] = useState<HTMLAudioElement | null>(null);
     const [sendUrl, setSendUrl] = useState<string>("");
 
     const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSendUrl(e.target.value);
+        const url = e.target.value;
+        const parts = url.split("/");
+        const id = parts[parts.length - 1];
+        setSendUrl(id);
+        console.log(id);
     };
     const [isLoading, setIsLoading] = useState(false);
     const handleUrlSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
-        // const sendData = {
-        //     url: sendUrl,
-        //     user_id: 1,
-        // };
-        // const res = await fetch("https://kzaecka7sp.us-west-2.awsapprunner.com/qiita");
-
-        // if (res.ok) {
-        //     const data = await res.json();
-        //     console.log("res data", data);
-        // } else {
-        //     console.log("fail");
-        // }
-        const synthesis_response = await fetch(
-            "https://kzaecka7sp.us-west-2.awsapprunner.com/qiita"
-        );
+        const synthesis_response = await fetch("http://localhost:8080/qiita", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                qiita_id: sendUrl,
+                user_id: data?.user.id,
+            }),
+        });
 
         const synthesis_response_buf = await synthesis_response.arrayBuffer();
 
@@ -56,6 +57,8 @@ export default function Reading() {
     };
     const handleEnd = () => {
         voiceURL?.pause();
+        setIsPaused(false);
+        setVoiceURL(null);
         //voiceURL.currentTime = 0;
     };
     return (
@@ -86,14 +89,14 @@ export default function Reading() {
                             {isPaused ? (
                                 <button
                                     onClick={handlePause}
-                                    className="block px-5 py-1 bg-slate-800 w-[49%]"
+                                    className="block px-5 py-1 bg-green-900 w-[49%]"
                                 >
                                     一時停止
                                 </button>
                             ) : (
                                 <button
                                     onClick={handleClickURL}
-                                    className="text-white block px-5 py-1 bg-slate-800 w-[49%]"
+                                    className="text-white block px-5 py-1 bg-green-900 w-[49%]"
                                 >
                                     再生する
                                 </button>
@@ -101,7 +104,7 @@ export default function Reading() {
 
                             <button
                                 onClick={handleEnd}
-                                className="block px-5 py-1 bg-slate-800 w-[49%]"
+                                className="block px-5 py-1 bg-[#141414] w-[49%]"
                             >
                                 終了
                             </button>

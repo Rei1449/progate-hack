@@ -152,3 +152,21 @@
         }
     }
 }
+.container {
+    display: flex;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.char {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

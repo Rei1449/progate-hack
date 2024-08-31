@@ -27,7 +27,9 @@ export default function Header() {
                 <nav>
                     <ul className="flex justify-between relative z-40">
                         <li className="ml-5">
-                            <Reading />
+                            <NextAuthProvider>
+                                <Reading />
+                            </NextAuthProvider>
                         </li>
                         <li className="ml-5">
                             <Meeting />

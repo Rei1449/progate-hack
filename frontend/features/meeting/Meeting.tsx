@@ -32,10 +32,8 @@ export default function Meeting() {
         );
         if (res.ok) {
             const data = await res.json();
-            console.log("room", data);
             const string = data.text;
             const parsedData = JSON.parse(string);
-            console.log(parsedData);
             setRooms(parsedData);
         }
     };
@@ -60,13 +58,12 @@ export default function Meeting() {
         );
         if (res.ok) {
             const data: BackRoom = await res.json();
-            console.log("maked room", data);
+
             setSendRoom("");
             setRooms((prev) => {
                 const updatedData = [data.text, ...prev];
                 return updatedData;
             });
-            console.log("Updated rooms:", rooms);
         }
     };
     return (
