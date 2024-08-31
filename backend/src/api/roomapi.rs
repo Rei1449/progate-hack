@@ -24,12 +24,19 @@ pub async fn save_room(room: web::Json<CreateRoom>) -> Result<HttpResponse> {
     use crate::schema::rooms::dsl::*;
     let mut connection = db_connect();
 
-    diesel::insert_into(rooms)
+    let room_data = diesel::insert_into(rooms)
         .values(&room.into_inner())
-        .execute(& mut connection)
+        .get_result::<RoomResponse>(& mut connection)
+        // .execute(& mut connection)
         .expect("Error inserting new room");
 
-    Ok(HttpResponse::Ok().json("Room Create Success."))
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(
+            serde_json::json!({ "text": room_data } )
+            .to_string()
+        )
+    )
 }
 
 #[get("/room/all")]

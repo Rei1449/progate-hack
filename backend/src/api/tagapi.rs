@@ -41,12 +41,19 @@ pub async fn save_tag(tag: web::Json<CreateTag>) -> Result<HttpResponse> {
     use crate::schema::tags::dsl::*;
     let mut connection = db_connect();
 
-    diesel::insert_into(tags)
+    let tag_data = diesel::insert_into(tags)
         .values(&tag.into_inner())
-        .execute(& mut connection)
+        // .execute(& mut connection)
+        .get_result::<TagResponse>(& mut connection)
         .expect("Error inserting new tag");
 
-    Ok(HttpResponse::Ok().json("Tag Create Success."))
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(
+            serde_json::json!({ "text": tag_data } )
+            .to_string()
+        )
+    )
 
 }
 #[post("/tag")]
@@ -59,11 +66,6 @@ pub async fn get_tag(info: web::Json<Info>) -> Result<HttpResponse> {
         .filter(user_id.eq(info.user_id.clone()))
         .load(&mut connection)
         .unwrap();
-        // .optional();
-
-        // for d in data{
-        //     println!("{:?}",d);
-        // }
     
     let json_string = serde_json::to_string(&data).unwrap();
 
@@ -85,11 +87,6 @@ pub async fn get_tag_all() -> Result<HttpResponse> {
         .select((id,title,user_id))
         .load(&mut connection)
         .unwrap();
-        // .optional();
-
-        // for d in data{
-        //     println!("{:?}",d);
-        // }
     
     let json_string = serde_json::to_string(&data).unwrap();
 
