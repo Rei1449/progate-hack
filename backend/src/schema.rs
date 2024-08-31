@@ -29,6 +29,14 @@ diesel::table! {
 }
 
 
+diesel::table! {
+    voices (id) {
+        id -> Int4,
+        voice_data -> Bytea,
+        qiita_id -> Text,
+        title -> Text,
+    }
+}
 
 diesel::joinable!(times -> tags (tag_id));
 
@@ -36,4 +44,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     tags,
     times,
     rooms,
+    voices,
 );
