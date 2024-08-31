@@ -1,19 +1,20 @@
-use std::{backtrace, str::Chars, panic};
+use std::{str::Chars};
 
-use std::env;
-use actix_web::dev::Response;
+// use std::env;
+// use actix_web::dev::Response;
 use actix_web::http::header::{Accept, ACCEPT};
 use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
-use api::tagapi::get_tag;
-// use backend::models;
-use diesel::{insert_into, PgConnection, RunQueryDsl};
+use api::tagapi::{save_tag, get_tag, get_tag_all};
+use api::timeapi::{save_time, get_time, get_time_all};
+// use api::timeapi::save_time;
+// use diesel::{insert_into, PgConnection, RunQueryDsl};
 // use log::info;
 // use actix_web::{actix, client};
 use reqwest::Client;
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use serde_json::Value;
 use actix_cors::Cors;
-use std::collections::HashMap;
+// use std::collections::HashMap;
 
 #[macro_use]
 extern crate diesel;
@@ -358,7 +359,6 @@ async fn main() -> std::io::Result<()> {
     //     eprintln!("Backtrace: {:?}", backtrace);
     // }));
 
-    use crate::api::tagapi::save_tag;
 
     HttpServer::new(|| {
 
@@ -376,6 +376,10 @@ async fn main() -> std::io::Result<()> {
             .route("/hey", web::get().to(manual_hello))
             .service(save_tag)
             .service(get_tag)
+            .service(get_tag_all)
+            .service(save_time)
+            .service(get_time)
+            .service(get_time_all)
     })
     .bind(("0.0.0.0", 8080))?
     .run()
