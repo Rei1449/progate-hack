@@ -12,16 +12,11 @@ export default function TimerLog({
 }: {
     propTodayData: TodayData[] | undefined;
 }) {
-    console.log("タグごとの今日のタイムデータ", propTodayData);
     const extractFields = (propTodayData: TodayData[] | undefined) => {
         return propTodayData?.map((item) => {
             const timePart = item.created_at.split("T")[1];
             let [hours, minutes] = timePart.split(":").map(Number);
-
-            // 9時間を加算
             hours = (hours + 9) % 24;
-
-            // 新しい時間を "HH:MM" の形式にフォーマット
             const hoursMinutes = `${String(hours).padStart(2, "0")}:${String(
                 minutes
             ).padStart(2, "0")}`;
@@ -33,7 +28,6 @@ export default function TimerLog({
         });
     };
     const parsedData = extractFields(propTodayData);
-    console.log("パースずみ", parsedData);
 
     const formData = (totalSeconds: number) => {
         const minutes = Math.floor(totalSeconds / 60);
@@ -46,7 +40,17 @@ export default function TimerLog({
     return (
         <div className="">
             <div className="md:mt-5 mt-2 w-[100%] bg-[#212121] lg:h-[400px] h-[150px] rounded-xl xl:p-10 p-5 overflow-y-scroll no-bar">
-                <p>今日の記録</p>
+                {parsedData?.length === 0 ? (
+                    <>
+                        <p className="text-gray-500">
+                            タスクを選択してください
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <p>今日の記録</p>
+                    </>
+                )}
                 {parsedData?.map((item: PropTodaydata, index: number) => (
                     <div
                         key={index}

@@ -1,17 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useTimer } from "./hooks/useTimer";
-// import TimerLog from "./components/TimerLog";
-// import TimerCategories from "./components/TimerCategories";
 import { TimerChart } from "./components/TimerChart";
-// import TImerTagForm from "./components/TImercategoryForm";
 
 import dynamic from "next/dynamic";
 
 // ダイナミックインポート
 const TimerLog = dynamic(() => import("./components/TimerLog"));
 const TimerCategories = dynamic(() => import("./components/TimerCategories"));
-// const TimerChart = dynamic(() => import("./components/TimerChart"));
 const TImerTagForm = dynamic(() => import("./components/TImercategoryForm"));
 
 import {
@@ -48,9 +44,7 @@ export type TodayData = {
 
 export default function Timer() {
     const { data } = useSession();
-    // const userId = data?.user.id;
-    // console.log(userId);
-    // console.log(data?.user.id);
+
     const {
         startTimer,
         pauseTimer,
@@ -68,9 +62,9 @@ export default function Timer() {
     const selectTagTodaydata = (id: number) => {
         return todayData.filter((item) => item.tag_id === id);
     };
+
     const handleClickTag = (tag: Tag, id: number) => {
         setViewTag(tag);
-        console.log("クリックされたid", id);
         const data = selectTagTodaydata(id);
         setPropTodayData(data);
         setSendTag(tag);
@@ -80,7 +74,6 @@ export default function Timer() {
         }
     };
 
-    //post time
     const [sendtag, setSendTag] = useState<Tag>();
     const postTime = async () => {
         if (!data?.user.id) {
@@ -110,6 +103,7 @@ export default function Timer() {
             });
         }
     };
+
     const [tags, setTags] = useState<Tag[]>([]);
 
     const getTags = async () => {
@@ -128,10 +122,8 @@ export default function Timer() {
         );
         if (res.ok) {
             const data = await res.json();
-            console.log(data.text);
             const string = data.text;
             const parsedData = JSON.parse(string);
-            console.log(parsedData);
             setTags(parsedData);
         }
     };
@@ -139,6 +131,7 @@ export default function Timer() {
         getTags();
         getTodayTime();
     }, [data?.user.id]);
+
     const [todayData, setTodayData] = useState<TodayData[]>([]);
     const getTodayTime = async () => {
         if (!data?.user.id) {
@@ -149,10 +142,10 @@ export default function Timer() {
         );
         if (res.ok) {
             const data = await res.json();
-            console.log("time today data", data);
             setTodayData(data);
         }
     };
+
     return (
         <>
             <div className="flex flex-row-reverse flex-wrap justify-between items-center md:w-[85%] w-[90%] mt-2 m-auto">
@@ -164,7 +157,7 @@ export default function Timer() {
             </div>
             <div className="text-2xl xl:text-6xl lg:text-4xl w-[85%] m-auto mt-10 ">
                 {viewTag === undefined ? (
-                    <>welcome to time</>
+                    <h1>welcome to time</h1>
                 ) : (
                     <>{viewTag?.title}</>
                 )}
@@ -228,7 +221,7 @@ export default function Timer() {
                 </DrawerTrigger>
                 <DrawerContent className="bg-[#161616] border-none min-h-[400px]">
                     <DrawerTitle className="hidden ">記録</DrawerTitle>
-                    <TimerChart />
+                    <TimerChart tag={viewTag} />
                 </DrawerContent>
             </Drawer>
         </>
