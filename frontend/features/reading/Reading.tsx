@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/drawer";
 
 export default function Reading() {
-    const [voiceURL, setVoiceURL] = useState<string>();
+    const [voiceURL, setVoiceURL] = useState<HTMLAudioElement>();
     const [sendUrl, setSendUrl] = useState<string>("");
 
     const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +20,7 @@ export default function Reading() {
         //     url: sendUrl,
         //     user_id: 1,
         // };
-        // const res = await fetch("http://localhost:8080/qiita");
+        // const res = await fetch("https://kzaecka7sp.us-west-2.awsapprunner.com/qiita");
 
         // if (res.ok) {
         //     const data = await res.json();
@@ -28,20 +28,29 @@ export default function Reading() {
         // } else {
         //     console.log("fail");
         // }
-        const synthesis_response = await fetch("http://localhost:8080/qiita");
+        const synthesis_response = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/qiita"
+        );
 
         const synthesis_response_buf = await synthesis_response.arrayBuffer();
 
         const blob = new Blob([synthesis_response_buf], { type: "audio/wav" });
         // BlobをURLに変換
         const url = URL.createObjectURL(blob);
-        setVoiceURL(url);
-        // const audio = new Audio(url);
+
+        const audio = new Audio(url);
+        setVoiceURL(audio);
         // audio.play();
     };
     const handleClickURL = () => {
-        const audio = new Audio(voiceURL);
-        audio.play();
+        voiceURL?.play();
+    };
+    const handlePause = () => {
+        voiceURL?.pause();
+    };
+    const handleEnd = () => {
+        voiceURL?.pause();
+        //voiceURL.currentTime = 0;
     };
     return (
         <Drawer>
@@ -69,6 +78,8 @@ export default function Reading() {
                         <button onClick={handleClickURL} className="text-white">
                             再生
                         </button>
+                        <button onClick={handlePause}>一時停止</button>
+                        <button onClick={handleEnd}>終了</button>
                     </>
                 ) : (
                     <>準備中</>
