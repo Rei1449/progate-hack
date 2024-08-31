@@ -1,9 +1,30 @@
-import React from "react";
+import { useSession } from "next-auth/react";
+import React, { useState } from "react";
 
 export default function TImercategoryForm() {
+    const { data } = useSession();
+    const [tag, setTag] = useState("");
+    const postTag = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const userId = data?.user.id;
+        const res = await fetch("http://localhost:8080/tag/create", {
+            body: JSON.stringify({ title: tag, user_id: userId }),
+        });
+        if (res.ok) {
+            const data = await res.json();
+            console.log(data);
+        }
+    };
+    const handleChangeTag = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTag(e.target.value);
+    };
     return (
-        <form className="md:w-[20%] w-[90%] m-auto relative md:mt-0">
+        <form
+            onSubmit={(e) => postTag(e)}
+            className="md:w-[20%] w-[90%] m-auto relative md:mt-0"
+        >
             <input
+                onChange={(e) => handleChangeTag(e)}
                 type="text"
                 name="category"
                 placeholder="add task"
