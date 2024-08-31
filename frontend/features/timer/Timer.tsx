@@ -12,8 +12,20 @@ import {
 } from "@/components/ui/drawer";
 import { TimerChart } from "./components/TimerChart";
 import TImercategoryForm from "./components/TImercategoryForm";
+import { useSession } from "next-auth/react";
+
+import { DefaultSession } from "next-auth";
+
+declare module "next-auth" {
+    interface Session {
+        user: {
+            id: string;
+        } & DefaultSession["user"];
+    }
+}
 
 export default function Timer() {
+    const { data } = useSession();
     const {
         startTimer,
         pauseTimer,
@@ -29,6 +41,27 @@ export default function Timer() {
         setViewCategory(category);
         if (seconds > 0 && confirm("現在の作業を完了しますか？")) {
             stopTimer();
+            postTime();
+        }
+    };
+
+    //post time
+    const postTime = async () => {
+        if (!data?.user.id) {
+            return;
+        }
+        const sendData = {
+            user_id: data?.user.id,
+            time: seconds,
+            tag_id: viewCategory,
+        };
+        const res = await fetch("", {
+            method: "POST",
+            body: JSON.stringify(sendData),
+        });
+        if (res.ok) {
+            const data = await res.json();
+            console.log(data);
         }
     };
     return (
@@ -72,7 +105,10 @@ export default function Timer() {
                         )}
                         {isActive && (
                             <button
-                                onClick={stopTimer}
+                                onClick={() => {
+                                    stopTimer();
+                                    postTime();
+                                }}
                                 className="hover:bg-[#08051d] hover:duration-300 rounded-md bg-[#1a1157] md:w-[120px] w-[80px] md:p-5 p-2 mt-5"
                             >
                                 Done!!!
