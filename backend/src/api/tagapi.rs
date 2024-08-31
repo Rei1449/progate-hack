@@ -49,7 +49,7 @@ pub async fn save_tag(tag: web::Json<CreateTag>) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().json("Tag Create Success."))
 
 }
-#[get("/tag")]
+#[post("/tag")]
 pub async fn get_tag(info: web::Json<Info>) -> Result<HttpResponse> {
     use crate::schema::tags::dsl::*;
     let mut connection = db_connect();

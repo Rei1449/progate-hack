@@ -50,7 +50,7 @@ pub async fn save_time(time: web::Json<CreateTime>) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().json("Time Create Success."))
 
 }
-#[get("/time")]
+#[post("/time")]
 pub async fn get_time(info: web::Json<Info>) -> Result<HttpResponse> {
     use crate::schema::times::dsl::*;;
     let mut connection = db_connect();
