@@ -7,6 +7,7 @@ use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
 use api::tagapi::{save_tag, get_tag, get_tag_all};
 use api::timeapi::{save_time, get_time, get_time_all};
 use api::roomapi::{save_room, get_room_all};
+use api::voiceapi::save_qiita;
 // use api::timeapi::save_time;
 // use diesel::{insert_into, PgConnection, RunQueryDsl};
 // use log::info;
@@ -123,126 +124,127 @@ async fn manual_hello() -> impl Responder {
 
 // }
 
-#[get("/qiita")]
-// async fn qiita()  -> Result<ReturnCheckBody> {
-// async fn qiita()  -> impl Responder {
-async fn qiita() -> HttpResponse {
-    let client = Client::new(); // 1
-    let url = "https://qiita.com/api/v2/items/8b81ef51ece9a06059fa";
-    let response = client
-        .get(url)
-        // .header("Bearer", "トークン")
-        .send()
-        .await // 2
-        .expect("Failed to send request");
-    println!("response \n {:?}",response);
-    // let body = response.text().await; // 3
-    let body = response
-        .text()
-        .await
-        .expect("Failed to read response text"); // ここでResultをアンラップ
-    // println!("body");
-    // println!("{:#?}", body);
-    // println!("type \n {}", type_name_of_val(response));
+// #[get("/qiita")]
+// // async fn qiita()  -> Result<ReturnCheckBody> {
+// // async fn qiita()  -> impl Responder {
+// async fn qiita() -> HttpResponse {
+//     let client = Client::new(); // 1
+//     let url = "https://qiita.com/api/v2/items/8b81ef51ece9a06059fa";
+//     let response = client
+//         .get(url)
+//         // .header("Bearer", "トークン")
+//         .send()
+//         .await // 2
+//         .expect("Failed to send request");
+//     println!("response \n {:?}",response);
+//     // let body = response.text().await; // 3
+//     let body = response
+//         .text()
+//         .await
+//         .expect("Failed to read response text"); // ここでResultをアンラップ
+//     // println!("body");
+//     // println!("{:#?}", body);
+//     // println!("type \n {}", type_name_of_val(response));
 
-    let mut return_data : String = "no data".to_string();
-    // let mut return_vec = vec![];
+//     let mut return_data : String = "no data".to_string();
+//     // let mut return_vec = vec![];
 
-    let mut response_data: ReturnCheckBody;
+//     let mut response_data: ReturnCheckBody;
 
-    let json_str = body.clone();
-    // JSON文字列をValueに変換
-    let v: Value = serde_json::from_str(&json_str).unwrap();
-    // rendered_bodyをデコードして表示
-    if let Some(rendered_body) = v.get("body") {    // マークダウンを取得
-    // if let Some(rendered_body) = v.get("rendered_body") {    // html
-        let decoded_html = rendered_body.as_str().unwrap();
-        println!("{}", decoded_html);
-        return_data = decoded_html.to_string();
-        // for i in return_data.as_str().chars(){
-        //     return_vec.push(i);
-        // }
-        let list_string = return_data.as_str().chars();
-        response_data = check_body(list_string);
-        // println!("\n{:?}",return_vec);
-        println!("{:?}",response_data.body_text);
-        println!("{:?}",response_data.body_code);
-        // println!("{}",return_data.as_str(list_string, chars().count());
-        // return Ok(response_data);
-    } else {
-        println!("No rendered_body found");
-        let void_return = ReturnCheckBody {
-            body_text: String::from(""),
-            body_code: vec![]
-        };
-        response_data = void_return;
-    }
-    // print!("[:?]}",ret.texe);
-    // Ok(ret)
-    // return Ok(response_data);
-    let json_string = format!(
-        "{{\"text\":{},\"code\":{:?},\"arr\":{}}}",
-        response_data.body_text,
-        response_data.body_code,
-        42
-    );
-
-    
-    let audio_text = response_data.body_text.replace("\r\n", "").replace("```", "").replace("\n", "").replace("#", "");
+//     let json_str = body.clone();
+//     // JSON文字列をValueに変換
+//     let v: Value = serde_json::from_str(&json_str).unwrap();
+//     // rendered_bodyをデコードして表示
+//     if let Some(rendered_body) = v.get("body") {    // マークダウンを取得
+//     // if let Some(rendered_body) = v.get("rendered_body") {    // html
+//         let decoded_html = rendered_body.as_str().unwrap();
+//         println!("{}", decoded_html);
+//         return_data = decoded_html.to_string();
+//         // for i in return_data.as_str().chars(){
+//         //     return_vec.push(i);
+//         // }
+//         let list_string = return_data.as_str().chars();
+//         response_data = check_body(list_string);
+//         // println!("\n{:?}",return_vec);
+//         println!("{:?}",response_data.body_text);
+//         println!("{:?}",response_data.body_code);
+//         // println!("{}",return_data.as_str(list_string, chars().count());
+//         // return Ok(response_data);
+//     } else {
+//         println!("No rendered_body found");
+//         let void_return = ReturnCheckBody {
+//             body_text: String::from(""),
+//             body_code: vec![]
+//         };
+//         response_data = void_return;
+//     }
+//     // print!("[:?]}",ret.texe);
+//     // Ok(ret)
+//     // return Ok(response_data);
+//     let json_string = format!(
+//         "{{\"text\":{},\"code\":{:?},\"arr\":{}}}",
+//         response_data.body_text,
+//         response_data.body_code,
+//         42
+//     );
 
 
-    // テキストを100文字ずつに分割
-    let chunks = split_text_length(&audio_text , 50);
+//     let audio_text = response_data.body_text.replace("\r\n", "").replace("```", "").replace("\n", "").replace("#", "");
 
-    // wavファイルのバイナリデータを格納するためのバッファ
-    let mut audio_binary: Vec<u8> = Vec::new();
-    let mut header: Vec<u8> = Vec::with_capacity(44);
-    let mut first_iteration = true;
 
-    for chunk in chunks {
-        let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
-        let response = client
-            .post(url)
-            .send()
-            .await
-            .expect("Failed to send voicevox audio_query request");
+//     // テキストを100文字ずつに分割
+//     let chunks = split_text_length(&audio_text , 50);
 
-        let synthesis_response = client
-            .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
-            .header("Content-Type", "application/json")
-            .header("Accept", "audio/wav")
-            .body(response)
-            .send()
-            .await
-            .expect("Failed to send request");
+//     // wavファイルのバイナリデータを格納するためのバッファ
+//     let mut audio_binary: Vec<u8> = Vec::new();
+//     let mut header: Vec<u8> = Vec::with_capacity(44);
+//     let mut first_iteration = true;
 
-        let audio_data = synthesis_response.bytes().await.unwrap();
+//     for chunk in chunks {
+//         let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+//         let response = client
+//             .post(url)
+//             .send()
+//             .await
+//             .expect("Failed to send voicevox audio_query request");
 
-        if first_iteration {
-            // 最初のデータでヘッダーを取得し、オーディオデータのヘッダー部分をスキップ
-            header.extend_from_slice(&audio_data.to_vec()[0..44]);
-            audio_binary.extend_from_slice(&audio_data.to_vec()[44..]);
-            first_iteration = false;
-        } else {
-            // 2回目以降はオーディオデータのみを追加
-            audio_binary.extend_from_slice(&audio_data.to_vec()[44..]);
-        }
-    }
+//         let synthesis_response = client
+//             .post("http://voicevox:50021/synthesis?speaker=3")
+//             .header("Content-Type", "application/json")
+//             .header("Accept", "audio/wav")
+//             .body(response)
+//             .send()
+//             .await
+//             .expect("Failed to send request");
 
-    // ファイルサイズとデータサイズを更新
-    let data_size = audio_binary.len() as u32;
-    let file_size = 36 + data_size; 
+//         let audio_data = synthesis_response.bytes().await.unwrap();
 
-    header[4..8].copy_from_slice(&file_size.to_le_bytes());
-    header[40..44].copy_from_slice(&data_size.to_le_bytes());
+//         if first_iteration {
+//             // 最初のデータでヘッダーを取得し、オーディオデータのヘッダー部分をスキップ
+//             header.extend_from_slice(&audio_data.to_vec()[0..44]);
+//             audio_binary.extend_from_slice(&audio_data.to_vec()[44..]);
+//             first_iteration = false;
+//         } else {
+//             // 2回目以降はオーディオデータのみを追加
+//             audio_binary.extend_from_slice(&audio_data.to_vec()[44..]);
+//         }
+//     }
 
-    let mut buffer: Vec<u8> = Vec::new();
-    buffer.extend_from_slice(&header);
-    buffer.extend_from_slice(&audio_binary);
+//     // ファイルサイズとデータサイズを更新
+//     let data_size = audio_binary.len() as u32;
+//     let file_size = 36 + data_size; 
 
-    // HTTPレスポンスを返す
-    HttpResponse::Ok().content_type("audio/wav").body(buffer)
-}
+//     header[4..8].copy_from_slice(&file_size.to_le_bytes());
+//     header[40..44].copy_from_slice(&data_size.to_le_bytes());
+
+//     let mut buffer: Vec<u8> = Vec::new();
+//     buffer.extend_from_slice(&header);
+//     buffer.extend_from_slice(&audio_binary);
+
+//     // HTTPレスポンスを返す
+//     HttpResponse::Ok().content_type("audio/wav").body(buffer)
+// }
+
 
 fn split_text_length(text: &String, length: usize) -> Vec<String> {
     text.chars()
@@ -355,24 +357,15 @@ async fn voice() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // panic::set_hook(Box::new(|panic_info| {
-    //     let backtrace = backtrace::Backtrace::capture();
-    //     eprintln!("Panic occurred: {:?}", panic_info);
-    //     eprintln!("Backtrace: {:?}", backtrace);
-    // }));
-
 
     HttpServer::new(|| {
 
         let cors = Cors::permissive();
-        // let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-        // let pool = db::establish_connection_pool(&database_url);
 
         App::new()
             .wrap(cors)
             // .app_data(web::Data::new(pool.clone()))
             .service(hello)
-            .service(qiita)
             .service(vv_test)
             .service(voice)
             .route("/hey", web::get().to(manual_hello))
@@ -384,6 +377,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_time_all)
             .service(save_room)
             .service(get_room_all)
+            .service(save_qiita)
     })
     .bind(("0.0.0.0", 8080))?
     .run()

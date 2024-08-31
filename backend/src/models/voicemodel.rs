@@ -4,7 +4,7 @@ use diesel::prelude::*;
 
 #[derive(Queryable, Insertable, Serialize, Deserialize)]
 #[table_name="voices"]
-pub struct CreateRoom {
+pub struct CreateVoice {
     pub voice_data: Vec<u8>,
     pub qiita_id: String,
     pub title: String
