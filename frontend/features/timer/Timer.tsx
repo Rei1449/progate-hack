@@ -31,6 +31,8 @@ export type Tag = {
 
 export default function Timer() {
     const { data } = useSession();
+    const userId = data?.user.id;
+    console.log("userid", userId);
     const {
         startTimer,
         pauseTimer,
@@ -63,16 +65,13 @@ export default function Timer() {
             time_second: seconds,
             tag_id: sendtag?.id,
         };
-        const res = await fetch(
-            "https://kzaecka7sp.us-west-2.awsapprunner.com/time/create",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(sendData),
-            }
-        );
+        const res = await fetch("http://localhost:8080/time/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sendData),
+        });
         if (res.ok) {
             const data = await res.json();
             console.log(data);
@@ -81,7 +80,9 @@ export default function Timer() {
     const [tags, setTags] = useState<Tag[]>([]);
 
     const getTags = async () => {
-        const userId = data?.user.id;
+        if (!data?.user.id) {
+            return;
+        }
         const res = await fetch(
             "https://kzaecka7sp.us-west-2.awsapprunner.com/tag",
             {
@@ -103,7 +104,7 @@ export default function Timer() {
     };
     useEffect(() => {
         getTags();
-    }, []);
+    }, [data?.user.id]);
     return (
         <>
             <div className="flex flex-row-reverse flex-wrap justify-between items-center md:w-[85%] w-[90%] mt-2 m-auto">

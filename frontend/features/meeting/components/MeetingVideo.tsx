@@ -2,11 +2,11 @@
 import React, { useState } from "react";
 import AgoraUIKit, { layout } from "agora-react-uikit";
 
-export default function MeetingVideo({ roomId }: { roomId: string }) {
+export default function MeetingVideo({ roomId }: { roomId: number }) {
     const [videoCall, setVideoCall] = useState(true);
     const rtcProps = {
         appId: "96bea3218ec6414f9f20f70d3ff8bfd3",
-        channel: roomId,
+        channel: `${roomId}`,
         token: null,
         layout: layout.grid,
     };

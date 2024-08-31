@@ -21,7 +21,7 @@ export default function TimerLog({ tag }: { tag: Tag | undefined }) {
     };
     return (
         <div className="">
-            <div className="md:mt-5 mt-2 w-[100%] bg-[#212121] lg:h-[400px] h-[120px] rounded-xl xl:p-10 p-5 overflow-y-scroll no-bar">
+            <div className="md:mt-5 mt-2 w-[100%] bg-[#212121] lg:h-[400px] h-[150px] rounded-xl xl:p-10 p-5 overflow-y-scroll no-bar">
                 {dummuyData.map(
                     (item: { date: string; time: number }, index: number) => (
                         <div
