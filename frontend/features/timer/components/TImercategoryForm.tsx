@@ -2,21 +2,28 @@
 import { useSession } from "next-auth/react";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { Tag } from "../Timer";
+import { useRouter } from "next/navigation";
 
 export default function TImercategoryForm({
     setTags,
 }: {
     setTags: Dispatch<SetStateAction<Tag[]>>;
 }) {
+    const router = useRouter();
     const { data } = useSession();
     const [tag, setTag] = useState("");
     const postTag = async (e: React.FormEvent<HTMLFormElement>) => {
-        if (!data?.user.id) {
-            return;
+        e.preventDefault();
+        if (!data) {
+            router.push("/login");
         }
+        // if (!data?.user.id) {
+        //     return;
+        // }
         e.preventDefault();
         const userId = data?.user.id;
         console.log("userId", userId);
+
         const res = await fetch(
             "https://kzaecka7sp.us-west-2.awsapprunner.com/tag/create",
             {
