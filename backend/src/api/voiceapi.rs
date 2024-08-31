@@ -57,8 +57,8 @@ fn check_body(body_data: &str) -> ReturnCheckBody {
                     // keep_code.pop();
                     return_data.body_code.push(keep_code.iter().collect());
                     keep_code = Vec::new();
-                    let into_code_number = format!("```{}```",return_data.body_code.len()-1);
-                    return_data.body_text.push_str(&into_code_number);
+                    // let into_code_number = format!("```{}```",return_data.body_code.len()-1);
+                    // return_data.body_text.push_str(&into_code_number);
                     continue;
                 }
             }

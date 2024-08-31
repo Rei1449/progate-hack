@@ -19,6 +19,12 @@ use serde::Deserialize;
 struct Info {
     user_id: String,
 }
+#[derive(Deserialize)]
+struct ManthInfo {
+    tagid: i32,
+    userid: String,
+}
+
 
 
 fn db_connect() -> PgConnection {
@@ -114,15 +120,55 @@ pub async fn get_today_time(path: web::Path<String>) -> Result<HttpResponse> {
 
     let data:Vec<TimeResponse> = times
     // .select((id,time_second,user_id,tag_id,created_at))
-    .filter(created_at.gt(today_start))
-    .filter(user_id.eq(userid))
-    .load(&mut connection)
-    .unwrap();
+        .filter(created_at.gt(today_start))
+        .filter(user_id.eq(userid))
+        .load(&mut connection)
+        .unwrap();
 
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(
             serde_json::json!( data )
+            .to_string()
+        )
+    )
+}
+#[get("time/month/{tagid}/{userid}")]
+pub async fn get_month_tag(info: web::Path<ManthInfo>) -> Result<HttpResponse> {
+    use crate::schema::times::dsl::*;
+    let mut connection = db_connect();
+    extern crate serde_json;
+    use chrono::{Datelike, TimeZone, Utc};
+    use chrono_tz::{Asia::Tokyo};
+
+    let utc = Utc::now().naive_utc();
+    let jst = Tokyo.from_utc_datetime(&utc);
+    let month_start = Tokyo.ymd(jst.year(), jst.month(), 1).and_hms(0, 0, 0);
+    let tagid = &info.tagid;
+    let userid = &info.userid;
+
+    let data:Vec<TimeResponse> = times
+        .filter(created_at.gt(month_start))
+        .filter(user_id.eq(userid))
+        .filter(tag_id.eq(tagid))
+        .load(&mut connection)
+        .unwrap();
+    let total_list:Vec<i32> = times
+        .select(time_second)
+        .filter(user_id.eq(userid))
+        .filter(tag_id.eq(tagid))
+        .load(&mut connection)
+        .unwrap();
+    let mut total: i128 = 0;
+    for i in total_list{
+        println!("{}",i);
+        total += (i as i128);
+    }
+
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(
+            serde_json::json!({"allSeconds":total, "month":data })
             .to_string()
         )
     )
