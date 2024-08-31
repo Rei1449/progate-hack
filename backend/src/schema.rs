@@ -16,7 +16,7 @@ diesel::table! {
         time_second -> Int4,
         user_id -> Text,
         tag_id -> Int4,
-        created_at -> Timestamp,
+        created_at -> Timestamptz,
         // updated_at -> Timestamp,
     }
 }
@@ -27,6 +27,8 @@ diesel::table! {
         name -> Text,
     }
 }
+
+
 
 diesel::joinable!(times -> tags (tag_id));
 
