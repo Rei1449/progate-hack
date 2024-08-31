@@ -6,6 +6,7 @@ use actix_web::http::header::{Accept, ACCEPT};
 use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
 use api::tagapi::{save_tag, get_tag, get_tag_all};
 use api::timeapi::{save_time, get_time, get_time_all};
+use api::roomapi::{save_room, get_room_all};
 // use api::timeapi::save_time;
 // use diesel::{insert_into, PgConnection, RunQueryDsl};
 // use log::info;
@@ -273,6 +274,8 @@ async fn main() -> std::io::Result<()> {
             .service(save_time)
             .service(get_time)
             .service(get_time_all)
+            .service(save_room)
+            .service(get_room_all)
     })
     .bind(("0.0.0.0", 8080))?
     .run()
