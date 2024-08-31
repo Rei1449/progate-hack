@@ -1,8 +1,18 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useTimer } from "./hooks/useTimer";
-import TimerLog from "./components/TimerLog";
-import TimerCategories from "./components/TimerCategories";
+// import TimerLog from "./components/TimerLog";
+// import TimerCategories from "./components/TimerCategories";
+import { TimerChart } from "./components/TimerChart";
+// import TImerTagForm from "./components/TImercategoryForm";
+
+import dynamic from "next/dynamic";
+
+// ダイナミックインポート
+const TimerLog = dynamic(() => import("./components/TimerLog"));
+const TimerCategories = dynamic(() => import("./components/TimerCategories"));
+// const TimerChart = dynamic(() => import("./components/TimerChart"));
+const TImerTagForm = dynamic(() => import("./components/TImercategoryForm"));
 
 import {
     Drawer,
@@ -10,8 +20,7 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer";
-import { TimerChart } from "./components/TimerChart";
-import TImerTagForm from "./components/TImercategoryForm";
+
 import { useSession } from "next-auth/react";
 
 import { DefaultSession } from "next-auth";
@@ -202,7 +211,7 @@ export default function Timer() {
                 </DrawerTrigger>
                 <DrawerContent className="bg-[#161616] border-none min-h-[400px]">
                     <DrawerTitle className="hidden ">記録</DrawerTitle>
-                    <TimerChart />
+                    {/* <TimerChart /> */}
                 </DrawerContent>
             </Drawer>
         </>
