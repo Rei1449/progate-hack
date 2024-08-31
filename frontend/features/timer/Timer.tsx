@@ -48,8 +48,9 @@ export type TodayData = {
 
 export default function Timer() {
     const { data } = useSession();
-    const userId = data?.user.id;
-
+    // const userId = data?.user.id;
+    // console.log(userId);
+    // console.log(data?.user.id);
     const {
         startTimer,
         pauseTimer,
@@ -63,9 +64,9 @@ export default function Timer() {
 
     const [viewTag, setViewTag] = useState<Tag>();
 
-    const [propTodayData, setPropTodayData] = useState<TodayData[]>();
+    const [propTodayData, setPropTodayData] = useState<TodayData[]>([]);
     const selectTagTodaydata = (id: number) => {
-        return todayData?.filter((item) => item.tag_id === id);
+        return todayData.filter((item) => item.tag_id === id);
     };
     const handleClickTag = (tag: Tag, id: number) => {
         setViewTag(tag);
@@ -90,16 +91,23 @@ export default function Timer() {
             time_second: seconds,
             tag_id: sendtag?.id,
         };
-        const res = await fetch("http://localhost:8080/time/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(sendData),
-        });
+        const res = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/time/create",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(sendData),
+            }
+        );
         if (res.ok) {
             const data = await res.json();
-            console.log("res timer", data);
+            const usedata: TodayData = data.text;
+            console.log("res timer", usedata);
+            setPropTodayData((prev) => {
+                return [...prev, usedata];
+            });
         }
     };
     const [tags, setTags] = useState<Tag[]>([]);
@@ -131,9 +139,14 @@ export default function Timer() {
         getTags();
         getTodayTime();
     }, [data?.user.id]);
-    const [todayData, setTodayData] = useState<TodayData[]>();
+    const [todayData, setTodayData] = useState<TodayData[]>([]);
     const getTodayTime = async () => {
-        const res = await fetch(`http://localhost:8080/time/today/${userId}`);
+        if (!data?.user.id) {
+            return;
+        }
+        const res = await fetch(
+            `https://kzaecka7sp.us-west-2.awsapprunner.com/time/today/${data?.user.id}`
+        );
         if (res.ok) {
             const data = await res.json();
             console.log("time today data", data);
@@ -149,9 +162,13 @@ export default function Timer() {
                     tags={tags}
                 />
             </div>
-            <p className="text-2xl xl:text-6xl lg:text-4xl w-[85%] m-auto mt-10 ">
-                {viewTag?.title}
-            </p>
+            <div className="text-2xl xl:text-6xl lg:text-4xl w-[85%] m-auto mt-10 ">
+                {viewTag === undefined ? (
+                    <>welcome to time</>
+                ) : (
+                    <>{viewTag?.title}</>
+                )}
+            </div>
             <div className="absolute mt-5 w-[80%] m-auto right-0 left-0 flex flex-row-reverse flex-wrap md:flex-nowrap justify-between items-start">
                 <div className="md:w-[70%] w-full lg:ml-10 md:ml-5 ml-0">
                     <p className="md:mt-0 mt-[-20px] xl:text-[250px] lg:text-[200px] md:text-[140px] text-[100px] w-fit m-auto md:w-0 md:m-0 text-gray-300">
@@ -206,12 +223,12 @@ export default function Timer() {
                 </div>
             </div>
             <Drawer>
-                <DrawerTrigger className="bg-black py-[12px] fixed bottom-0 right-0 left-0">
-                    「Qiita執筆」記録を見る
+                <DrawerTrigger className="bg-black py-[12px] fixed bottom-0 right-0 left-0 w-[90%] rounded-md mx-auto ">
+                    {viewTag?.title} 記録を見る
                 </DrawerTrigger>
                 <DrawerContent className="bg-[#161616] border-none min-h-[400px]">
                     <DrawerTitle className="hidden ">記録</DrawerTitle>
-                    {/* <TimerChart /> */}
+                    <TimerChart />
                 </DrawerContent>
             </Drawer>
         </>
