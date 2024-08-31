@@ -126,7 +126,7 @@ async fn manual_hello() -> impl Responder {
 // async fn qiita()  -> impl Responder {
 async fn qiita() -> HttpResponse {
     let client = Client::new(); // 1
-    let url = "https://qiita.com/api/v2/items/0e2a5a3d047e6b08c811";
+    let url = "https://qiita.com/api/v2/items/8b81ef51ece9a06059fa";
     let response = client
         .get(url)
         // .header("Bearer", "トークン")
