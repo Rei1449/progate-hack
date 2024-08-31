@@ -14,8 +14,10 @@ export default function Reading() {
     const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSendUrl(e.target.value);
     };
+    const [isLoading, setIsLoading] = useState(false);
     const handleUrlSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLoading(true);
         // const sendData = {
         //     url: sendUrl,
         //     user_id: 1,
@@ -40,12 +42,16 @@ export default function Reading() {
 
         const audio = new Audio(url);
         setVoiceURL(audio);
+        setIsLoading(false);
         // audio.play();
     };
     const handleClickURL = () => {
+        setIsPaused(true);
         voiceURL?.play();
     };
+    const [isPaused, setIsPaused] = useState(false);
     const handlePause = () => {
+        setIsPaused(false);
         voiceURL?.pause();
     };
     const handleEnd = () => {
@@ -58,7 +64,7 @@ export default function Reading() {
                 <img src="./music.svg" className="w-[20px]" />
                 <p className="md:block hidden ml-2">Article</p>
             </DrawerTrigger>
-            <DrawerContent className="h-[80%] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
+            <DrawerContent className="min-h-[50%] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
                 <DrawerTitle className="font-bold text-2xl text-gray-300 mt-10 w-fit md:mx-0 mx-auto">
                     Article Listening
                 </DrawerTitle>
@@ -70,19 +76,51 @@ export default function Reading() {
                         className="border-b border-gray-500 bg-transparent px-5 py-5 w-full mt-2 outline-none focus:outline-none focus:duration-300"
                     />
                     <button className="w-[150px] m-auto block mt-5 border-green-800 text-gray-500 hover:duration-300 hover:text-white border px-5 py-2 rounded-md">
-                        読み上げ！
+                        選択
                     </button>
                 </form>
+
                 {voiceURL ? (
                     <>
-                        <button onClick={handleClickURL} className="text-white">
-                            再生
-                        </button>
-                        <button onClick={handlePause}>一時停止</button>
-                        <button onClick={handleEnd}>終了</button>
+                        <div className="flex justify-between md:w-[50%] w-[70%] mx-auto mt-5 bg-black p-1 rounded-md">
+                            {isPaused ? (
+                                <button
+                                    onClick={handlePause}
+                                    className="block px-5 py-1 bg-slate-800 w-[49%]"
+                                >
+                                    一時停止
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleClickURL}
+                                    className="text-white block px-5 py-1 bg-slate-800 w-[49%]"
+                                >
+                                    再生する
+                                </button>
+                            )}
+
+                            <button
+                                onClick={handleEnd}
+                                className="block px-5 py-1 bg-slate-800 w-[49%]"
+                            >
+                                終了
+                            </button>
+                        </div>
+                        <div
+                            className={
+                                isPaused ? "moving-line move" : "moving-line "
+                            }
+                        ></div>
                     </>
                 ) : (
-                    <>準備中</>
+                    <>
+                        {isLoading && (
+                            <div className="text-[#077803] flex w-fit mx-auto items-center mt-5">
+                                <div className="loader"></div>
+                                <p className="ml-5">ロード中</p>
+                            </div>
+                        )}
+                    </>
                 )}
             </DrawerContent>
         </Drawer>
