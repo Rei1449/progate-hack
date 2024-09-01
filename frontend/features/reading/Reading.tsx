@@ -181,7 +181,7 @@ export default function Reading() {
                     </>
                 )}
                 <div className="mt-20">
-                    <p className="text-[#077803]">過去に聞いた記事</p>
+                    <p className="text-[#077803] ml-1">過去に聞いた記事</p>
                     <div className="md:w-[70%] w-full mx-auto">
                         {articles.map((article: Article) => (
                             <div className="border-b border-[#077803] pb-2 mt-5">
