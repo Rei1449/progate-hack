@@ -38,6 +38,15 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+  user_voices (id) {
+      id -> Int4,
+      user_id -> Text,
+      qiita_id -> Text,
+      title -> Text,
+  }
+}
+
 diesel::joinable!(times -> tags (tag_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
@@ -45,4 +54,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     times,
     rooms,
     voices,
+    user_voices,
 );
