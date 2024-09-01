@@ -102,11 +102,14 @@ export default function Reading() {
     };
     const [articles, setArticles] = useState<Article[]>([]);
     const getArticle = async () => {
+        if (!data?.user.id) {
+            return;
+        }
         const res = await fetch(`http://localhost:8080/qiita/${data?.user.id}`);
         if (res.ok) {
             const data = await res.json();
             console.log("data yo", data);
-            setArticles;
+            setArticles(data.text);
         }
     };
     useEffect(() => {
