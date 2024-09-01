@@ -259,7 +259,7 @@ fn split_text_length(text: &String, length: usize) -> Vec<String> {
 async fn vv_test() -> HttpResponse {
     println!("vv");
     let client = Client::new();
-    let url = "http://voicevox:50021/audio_query?text=ずんだもんなのだ&speaker=3";
+    let url = "https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text=ずんだもんなのだ&speaker=3";
     let response = client
         .post(url)
         .header("Content-Type", "application/json")
@@ -267,7 +267,7 @@ async fn vv_test() -> HttpResponse {
         .await
         .expect("Failed to send request");
     
-    let synthesis_url = "http://voicevox:50021/synthesis?speaker=3";
+    let synthesis_url = "https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3";
     
     let synthesis_response = client
         .post(synthesis_url)
@@ -309,7 +309,7 @@ async fn voice() -> HttpResponse {
     let mut first_iteration = true;
 
     for chunk in chunks {
-        let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+        let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
         let response = client
             .post(url)
             .send()
@@ -317,7 +317,7 @@ async fn voice() -> HttpResponse {
             .expect("Failed to send voicevox audio_query request");
 
         let synthesis_response = client
-            .post("http://voicevox:50021/synthesis?speaker=3")
+            .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
             .header("Content-Type", "application/json")
             .header("Accept", "audio/wav")
             .body(response)

@@ -4,6 +4,7 @@ use actix_web::{get, post, web, Result};
 
 // use std::env;
 use diesel::prelude::*;
+use diesel::sql_types::Timestamp;
 
 use crate::models::timemodel::*;
 
@@ -14,6 +15,9 @@ use diesel::pg::PgConnection;
 use dotenv::dotenv;
 
 use serde::Deserialize;
+
+use std::collections::HashMap;
+use chrono::NaiveDateTime;
 
 #[derive(Deserialize)]
 struct Info {
@@ -55,7 +59,6 @@ pub async fn save_time(time: web::Json<CreateTime>) -> Result<HttpResponse> {
             .to_string()
         )
     )
-
 }
 #[post("/time")]
 pub async fn get_time(info: web::Json<Info>) -> Result<HttpResponse> {
@@ -83,7 +86,7 @@ pub async fn get_time(info: web::Json<Info>) -> Result<HttpResponse> {
 }
 #[get("/time/all")]
 pub async fn get_time_all() -> Result<HttpResponse> {
-    use crate::schema::times::dsl::*;;
+    use crate::schema::times::dsl::*;
     let mut connection = db_connect();
 
     let data:Vec<TimeResponse> = times
@@ -147,28 +150,46 @@ pub async fn get_month_tag(info: web::Path<ManthInfo>) -> Result<HttpResponse> {
     let tagid = &info.tagid;
     let userid = &info.userid;
 
-    let data:Vec<TimeResponse> = times
-        .filter(created_at.gt(month_start))
-        .filter(user_id.eq(userid))
-        .filter(tag_id.eq(tagid))
-        .load(&mut connection)
-        .unwrap();
     let total_list:Vec<i32> = times
-        .select(time_second)
-        .filter(user_id.eq(userid))
-        .filter(tag_id.eq(tagid))
-        .load(&mut connection)
-        .unwrap();
+    .select(time_second)
+    .filter(user_id.eq(userid))
+    .filter(tag_id.eq(tagid))
+    .load(&mut connection)
+    .unwrap();
     let mut total: i128 = 0;
     for i in total_list{
         println!("{}",i);
         total += (i as i128);
     }
 
+    let data:Vec<TimeResponse> = times
+        .filter(created_at.gt(month_start))
+        .filter(user_id.eq(userid))
+        .filter(tag_id.eq(tagid))
+        .load(&mut connection)
+        .unwrap();
+    // let mut month:HashMap<chrono::Date<chrono_tz::Tz>, i128> = HashMap::new();
+    let jst = Tokyo.from_utc_datetime(&chrono::Utc::now().naive_utc());
+    let mut month:HashMap<u32, i128> = HashMap::new();
+    for i in 1..32{
+        month.insert(i, 0);
+    }
+    // let month_total_vec:Vec<i128> = vec![];
+    for d in &data{
+        // let day = Tokyo.ymd(jst.year(), jst.month(), d.created_at.day());
+        let day = d.created_at.day();
+        // let time = 
+        if let Some(total_time) = month.get_mut(&day) {
+            *total_time += d.time_second as i128;
+        }
+    }
+
+    println!("{:#?}",month);
+
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(
-            serde_json::json!({"allSeconds":total, "month":data })
+            serde_json::json!({"allSeconds":total, "month":month })
             .to_string()
         )
     )
