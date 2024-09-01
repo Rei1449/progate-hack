@@ -102,9 +102,7 @@ export default function Reading() {
     };
     const [articles, setArticles] = useState<Article[]>([]);
     const getArticle = async () => {
-        const res = await fetch(
-            `https://kzaecka7sp.us-west-2.awsapprunner.com/qiita/${data?.user.id}`
-        );
+        const res = await fetch(`http://localhost:8080/qiita/${data?.user.id}`);
         if (res.ok) {
             const data = await res.json();
             console.log("data yo", data);
@@ -112,8 +110,8 @@ export default function Reading() {
         }
     };
     useEffect(() => {
-        // getArticle();
-    }, []);
+        getArticle();
+    }, [data?.user.id]);
     return (
         <Drawer>
             <DrawerTrigger className="md:ml-5 ml-2 flex items-center">
