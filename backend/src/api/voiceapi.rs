@@ -245,7 +245,6 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
 async fn testbinary() -> HttpResponse {
     let mut connection = db_connect();
     let data:Vec<VoiceResponse> = voices.load(& mut connection).unwrap();
-
     let first_record = data.first().unwrap();
 
     HttpResponse::Ok().content_type("audio/wav").body(first_record.voice_data.clone())
