@@ -105,7 +105,7 @@ export default function Reading() {
         if (!data?.user.id) {
             return;
         }
-        const res = await fetch(`http://localhost:8080/qiita/${data?.user.id}`);
+        const res = await fetch(`https://kzaecka7sp.us-west-2.awsapprunner.com/qiita/${data?.user.id}`);
         if (res.ok) {
             const data = await res.json();
             console.log("data yo", data);
