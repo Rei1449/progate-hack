@@ -77,6 +77,8 @@ export default function Reading() {
             <DrawerContent className="min-h-[50%] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
                 <DrawerTitle className="font-bold text-2xl text-gray-300 mt-10 w-fit md:mx-0 mx-auto">
                     Article Listening
+                    <br />
+                    <span className="text-[12px]">VOICEVOX:ずんだもん</span>
                 </DrawerTitle>
                 <form onSubmit={(e) => handleUrlSubmit(e)}>
                     <input
