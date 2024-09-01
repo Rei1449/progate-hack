@@ -216,9 +216,11 @@ export default function Timer() {
                 </div>
             </div>
             <Drawer>
-                <DrawerTrigger className="bg-black py-[12px] fixed bottom-0 right-0 left-0 w-[90%] rounded-md mx-auto ">
-                    {viewTag?.title} 記録を見る
-                </DrawerTrigger>
+                {viewTag !== undefined && (
+                    <DrawerTrigger className="bg-[#0e0e0e] py-[12px] fixed bottom-0 right-0 left-0 w-[90%] rounded-md mx-auto ">
+                        {viewTag?.title} 記録を見る
+                    </DrawerTrigger>
+                )}
                 <DrawerContent className="bg-[#161616] border-none min-h-[400px]">
                     <DrawerTitle className="hidden ">記録</DrawerTitle>
                     <TimerChart tag={viewTag} />
