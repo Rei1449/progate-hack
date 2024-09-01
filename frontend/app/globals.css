@@ -111,7 +111,48 @@
         transform: rotate(1turn);
     }
 }
-
+.loader-title {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(farthest-side, #363636 94%, #0000) top/8px 8px
+            no-repeat,
+        conic-gradient(#0000 30%, #363636);
+    -webkit-mask: radial-gradient(
+        farthest-side,
+        #0000 calc(100% - 8px),
+        #000 0
+    );
+    animation: l13 1s infinite linear;
+}
+.load-task {
+    width: 30px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(farthest-side, #363636 94%, #0000) top/8px 8px
+            no-repeat,
+        conic-gradient(#0000 30%, #363636);
+    -webkit-mask: radial-gradient(
+        farthest-side,
+        #0000 calc(100% - 8px),
+        #000 0
+    );
+    animation: l13 1s infinite linear;
+}
+.load-chart {
+    width: 80px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(farthest-side, #138f6c 94%, #0000) top/8px 8px
+            no-repeat,
+        conic-gradient(#0000 30%, #138f6c);
+    -webkit-mask: radial-gradient(
+        farthest-side,
+        #0000 calc(100% - 8px),
+        #000 0
+    );
+    animation: l13 1s infinite linear;
+}
 .moving-line {
     width: 300px;
     height: 4px; /* 線の高さ */
