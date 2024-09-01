@@ -24,27 +24,29 @@ export default function Reading() {
     const handleUrlSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
-        const synthesis_response = await fetch("http://localhost:8080/qiita", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                qiita_id: sendUrl,
-                user_id: data?.user.id,
-            }),
-        });
+        const synthesis_response = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/qiita/tokio",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    qiita_id: sendUrl,
+                    user_id: data?.user.id,
+                }),
+            }
+        );
 
         const synthesis_response_buf = await synthesis_response.arrayBuffer();
 
         const blob = new Blob([synthesis_response_buf], { type: "audio/wav" });
-        // BlobをURLに変換
+
         const url = URL.createObjectURL(blob);
 
         const audio = new Audio(url);
         setVoiceURL(audio);
         setIsLoading(false);
-        // audio.play();
     };
     const handleClickURL = () => {
         setIsPaused(true);
@@ -59,7 +61,6 @@ export default function Reading() {
         voiceURL?.pause();
         setIsPaused(false);
         setVoiceURL(null);
-        //voiceURL.currentTime = 0;
     };
     return (
         <Drawer>
