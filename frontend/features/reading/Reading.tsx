@@ -7,6 +7,7 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Reading() {
     const { data } = useSession();
@@ -21,9 +22,14 @@ export default function Reading() {
         console.log(id);
     };
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+
     const handleUrlSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
+        if (!data) {
+            router.push("/login");
+        }
         const synthesis_response = await fetch(
             "https://kzaecka7sp.us-west-2.awsapprunner.com/qiita/tokio",
             {
