@@ -1,7 +1,4 @@
 use std::{str::Chars};
-
-// use std::env;
-// use actix_web::dev::Response;
 use actix_web::http::header::{Accept, ACCEPT};
 use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
 use api::tagapi::{save_tag, get_tag, get_tag_all};
@@ -9,105 +6,96 @@ use api::timeapi::{get_month_tag, get_time, get_time_all, get_today_time, save_t
 use api::roomapi::{save_room, get_room_all};
 use api::voiceapi::{save_qiita, save_qiita_tokio, testbinary};
 use api::uservoiceapi::get_user_qiita;
-// use api::timeapi::save_time;
-// use diesel::{insert_into, PgConnection, RunQueryDsl};
-// use log::info;
-// use actix_web::{actix, client};
 use reqwest::Client;
 use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use serde_json::Value;
 use actix_cors::Cors;
-// use std::collections::HashMap;
 
 #[macro_use]
 extern crate diesel;
 
-// mod db;
 mod api;
 mod models;
 mod schema;
 
 
-type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-pub struct ReturnCheckBody {
-    body_text: String,
-    body_code: Vec<String>
-}
+// type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+// pub struct ReturnCheckBody {
+//     body_text: String,
+//     body_code: Vec<String>
+// }
 
-fn check_body(body_data: Chars) -> ReturnCheckBody {
-    let mut return_data = ReturnCheckBody {
-        body_text: String::from(""),
-        body_code: vec![]
-    };
-    let mut back_quotation_count = 0;
-    let mut code_zone = false;
-    let mut code_zone_start_n = false;
-    let mut keep_code: Vec<char> = Vec::new();
-    let mut befor_word = 'a';
-    for ch in body_data{
-        if befor_word != '`'{
-            back_quotation_count = 0;
-        }
-        befor_word = ch;
-        if ch == '`' { 
-            back_quotation_count += 1;
-            if back_quotation_count >= 3 {
-                code_zone = !code_zone;
-                back_quotation_count = 0;
-                if code_zone {
-                    code_zone_start_n = true;
-                    return_data.body_text.pop();
-                    return_data.body_text.pop();
-                    // return_data.body_text.pop();
-                    continue;
-                } else {
-                    keep_code.pop();
-                    keep_code.pop();
-                    // keep_code.pop();
-                    return_data.body_code.push(keep_code.iter().collect());
-                    keep_code = Vec::new();
-                    let into_code_number = format!("```{}```",return_data.body_code.len()-1);
-                    return_data.body_text.push_str(&into_code_number);
-                    continue;
-                }
-            }
-        }
-        // '''で囲まれている箇所をコードとして保存
-        if code_zone {
-            if code_zone_start_n {
-                if ch == '\n' {
-                    code_zone_start_n = false;
-                    continue;
-                } else {
-                    continue;
-                }
-            }
-            keep_code.push(ch);
-            continue;
-        }
-        return_data.body_text.push(ch);
-    }
-    return_data
-}
+// fn check_body(body_data: Chars) -> ReturnCheckBody {
+//     let mut return_data = ReturnCheckBody {
+//         body_text: String::from(""),
+//         body_code: vec![]
+//     };
+//     let mut back_quotation_count = 0;
+//     let mut code_zone = false;
+//     let mut code_zone_start_n = false;
+//     let mut keep_code: Vec<char> = Vec::new();
+//     let mut befor_word = 'a';
+//     for ch in body_data{
+//         if befor_word != '`'{
+//             back_quotation_count = 0;
+//         }
+//         befor_word = ch;
+//         if ch == '`' { 
+//             back_quotation_count += 1;
+//             if back_quotation_count >= 3 {
+//                 code_zone = !code_zone;
+//                 back_quotation_count = 0;
+//                 if code_zone {
+//                     code_zone_start_n = true;
+//                     return_data.body_text.pop();
+//                     return_data.body_text.pop();
+//                     // return_data.body_text.pop();
+//                     continue;
+//                 } else {
+//                     keep_code.pop();
+//                     keep_code.pop();
+//                     // keep_code.pop();
+//                     return_data.body_code.push(keep_code.iter().collect());
+//                     keep_code = Vec::new();
+//                     let into_code_number = format!("```{}```",return_data.body_code.len()-1);
+//                     return_data.body_text.push_str(&into_code_number);
+//                     continue;
+//                 }
+//             }
+//         }
+//         // '''で囲まれている箇所をコードとして保存
+//         if code_zone {
+//             if code_zone_start_n {
+//                 if ch == '\n' {
+//                     code_zone_start_n = false;
+//                     continue;
+//                 } else {
+//                     continue;
+//                 }
+//             }
+//             keep_code.push(ch);
+//             continue;
+//         }
+//         return_data.body_text.push(ch);
+//     }
+//     return_data
+// }
 
-async fn test_voicevox() -> HttpResponse {
-    // let mut map = HashMap::new();
-    // map.insert("speaker", "1");
-    // map.insert("text", "aa");
+// async fn test_voicevox() -> HttpResponse {
 
-    let client = Client::new();
-    let url = "http://0.0.0.0:50021/audio_query?text=qqq&speaker=3";
-    let response = client
-        .post(url)
-        .header("Content-Type", "application/json")
-        // .json(&map)
-        .send()
-        .await;
-        // .expect("Failed to send request");
-    println!("{:?}",response);
-    println!("test_voicevox");
-    HttpResponse::Ok().content_type("application/json").body(r#"{"return":"ok"}"#)
-}
+//     let client = Client::new();
+//     let url = "http://0.0.0.0:50021/audio_query?text=qqq&speaker=3";
+//     let response = client
+//         .post(url)
+//         .header("Content-Type", "application/json")
+//         // .json(&map)
+//         .send()
+//         .await;
+//         // .expect("Failed to send request");
+//     println!("{:?}",response);
+//     println!("test_voicevox");
+//     HttpResponse::Ok().content_type("application/json").body(r#"{"return":"ok"}"#)
+// }
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -158,14 +146,6 @@ async fn vv_test() -> HttpResponse {
 
     // HTTPレスポンスを返す
     HttpResponse::Ok().content_type("audio/wav").body(audio_data)
-    // HttpResponse::Ok().content_type("application/json").body(format!(r#"{{"response": "{:?}"}}"#, audio_data))
-
-
-    // println!("{:?}",response);
-    // println!("test_voicevox");
-    // HttpResponse::Ok().content_type("application/json").body(r#"{"return":"ok"}"#)
-    // test_voicevox().await;
-    // HttpResponse::Ok().content_type("application/json").body(r#"{"return":"ok"}"#)
 }
 
 // バイナリ形式を結合させてフロントに返せた！

@@ -30,10 +30,7 @@ pub async fn get_user_qiita(info: web::Path<Info>) -> Result<HttpResponse> {
         .filter(user_id.eq(info.user_id.clone()))
         .load(&mut connection)
         .unwrap();
-    
-    // let json_string = serde_json::to_string(&data).unwrap();
 
-    // Ok(HttpResponse::Ok().json("Tag Create Success."))
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(
