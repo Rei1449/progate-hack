@@ -15,10 +15,15 @@ use reqwest::Client;
 use serde_json::Value;
 use tokio::time::{sleep, Duration, Instant};
 use futures::future::join_all;
+use crate::models::uservoicemodel::*;
+use crate::models::uservoicemodel::CreateUserVoice;
+use crate::schema::user_voices::{qiita_id as uv_qiita_id, user_id, title};
+use crate::schema::user_voices::dsl::*;
 
 #[derive(Deserialize)]
 struct Info {
     qiita_id: String,
+    user_id: String,
 }
 fn db_connect() -> PgConnection {
     dotenv().ok();
@@ -427,6 +432,8 @@ async fn save_qiita_tokio(info: web::Json<Info>) -> impl Responder {
     let binary_data = confilm_binary(info.qiita_id.clone()).await;
 
     if binary_data.len() > 0 {
+        let confilm_user_voice = store_user_voices(info.user_id.clone(), info.qiita_id.clone()).await;
+        println!("{:?}", confilm_user_voice);
         let first_record = binary_data.first().unwrap();
         return HttpResponse::Ok().content_type("audio/wav").body(first_record.voice_data.clone())
     }
@@ -449,6 +456,39 @@ async fn confilm_binary(confilm_qiita_id:String) -> Vec<VoiceResponse> {
     .unwrap();
 
     return data;
+}
+
+async fn store_user_voices(confilm_user_id:String, confilm_qiita_id:String) -> bool {
+    let mut connection = db_connect();
+    let data:Vec<UserVoiceResponse> = user_voices
+    .filter(uv_qiita_id.eq(confilm_qiita_id.clone()))
+    .filter(user_id.eq(confilm_user_id.clone()))
+    .load(& mut connection)
+    .unwrap();
+
+    if data.len() > 0 {
+        return true;
+    }
+    else {
+        // let client = Client::new();
+        // let url = format!("https://qiita.com/api/v2/items/{}", confilm_qiita_id);
+        // let response = client.get(&url).send().await;
+        // let body = response.expect("Failed to get a valid response").text().await;
+
+        // let v: Value = serde_json::from_str(&body).expect("Failed to Error");
+        // let v_title = v.get("title").unwrap();
+
+
+        let input_user_voice = CreateUserVoice {
+            user_id: String::from(confilm_user_id.clone()), 
+            qiita_id: String::from(confilm_qiita_id.clone()), 
+            // title: String::from(v_title.as_str().unwrap())
+            title: String::from("title")
+        };
+        let return_user_voice_data = diesel::insert_into(user_voices)
+        .values(&input_user_voice);
+        return false;
+    }
 }
 
 async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<dyn std::error::Error>> {
@@ -557,6 +597,8 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
     let return_voice_data = diesel::insert_into(voices)
         .values(&input_voice)
         .get_result::<VoiceResponse>(&mut connection)?;
+    
+    let store_user_voice = store_user_voices(info.user_id.clone(), info.qiita_id.clone()).await;
 
     Ok(HttpResponse::Ok().content_type("audio/wav").body(buffer))
 }
