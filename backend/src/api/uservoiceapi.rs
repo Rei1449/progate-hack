@@ -21,7 +21,7 @@ fn db_connect() -> PgConnection {
 }
 
 
-#[get("/qiita/{userid}")]
+#[get("/qiita/{user_id}")]
 pub async fn get_user_qiita(info: web::Path<Info>) -> Result<HttpResponse> {
     use crate::schema::user_voices::dsl::*;
     let mut connection = db_connect();
