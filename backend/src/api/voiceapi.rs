@@ -173,7 +173,7 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
     let mut first_iteration = true;
 
     for chunk in chunks {
-        let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+        let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
         let response = client
             .post(url)
             .send()
@@ -181,7 +181,7 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
             .expect("Failed to send voicevox audio_query request");
 
         let synthesis_response = client
-            .post("http://voicevox:50021/synthesis?speaker=3")
+            .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
             .header("Content-Type", "application/json")
             .header("Accept", "audio/wav")
             .body(response)
@@ -470,11 +470,11 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
         let audio_map = Arc::clone(&audio_map);
 
         let task = tokio::spawn(async move {
-            let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+            let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
             let response = client.post(&url).send().await?;
 
             let synthesis_response = client
-                .post("http://voicevox:50021/synthesis?speaker=3")
+                .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
                 .header("Content-Type", "application/json")
                 .header("Accept", "audio/wav")
                 .body(response.text().await?)
