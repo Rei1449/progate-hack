@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Drawer,
     DrawerContent,
@@ -8,7 +8,10 @@ import {
 } from "@/components/ui/drawer";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
+type Article = {
+    title: string;
+    qiita_id: string;
+};
 export default function Reading() {
     const { data } = useSession();
     const [voiceURL, setVoiceURL] = useState<HTMLAudioElement | null>(null);
@@ -23,6 +26,35 @@ export default function Reading() {
     };
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const handleArticleLisn = async (id: string) => {
+        setIsLoading(true);
+        if (!data) {
+            router.push("/login");
+        }
+        const synthesis_response = await fetch(
+            "https://kzaecka7sp.us-west-2.awsapprunner.com/qiita/tokio",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    qiita_id: id,
+                    user_id: data?.user.id,
+                }),
+            }
+        );
+
+        const synthesis_response_buf = await synthesis_response.arrayBuffer();
+
+        const blob = new Blob([synthesis_response_buf], { type: "audio/wav" });
+
+        const url = URL.createObjectURL(blob);
+
+        const audio = new Audio(url);
+        setVoiceURL(audio);
+        setIsLoading(false);
+    };
 
     const handleUrlSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -68,13 +100,27 @@ export default function Reading() {
         setIsPaused(false);
         setVoiceURL(null);
     };
+    const [articles, setArticles] = useState<Article[]>([]);
+    const getArticle = async () => {
+        const res = await fetch(
+            `https://kzaecka7sp.us-west-2.awsapprunner.com/qiita/${data?.user.id}`
+        );
+        if (res.ok) {
+            const data = await res.json();
+            console.log("data yo", data);
+            setArticles;
+        }
+    };
+    useEffect(() => {
+        // getArticle();
+    }, []);
     return (
         <Drawer>
             <DrawerTrigger className="md:ml-5 ml-2 flex items-center">
                 <img src="./music.svg" className="w-[20px]" />
                 <p className="md:block hidden ml-2">Article</p>
             </DrawerTrigger>
-            <DrawerContent className="min-h-[50%] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
+            <DrawerContent className="h-[60%] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
                 <DrawerTitle className="font-bold text-2xl text-gray-300 mt-10 w-fit md:mx-0 mx-auto">
                     Article Listening
                     <br />
@@ -134,6 +180,24 @@ export default function Reading() {
                         )}
                     </>
                 )}
+                <div className="mt-20">
+                    <p className="text-[#077803]">過去に聞いた記事</p>
+                    <div className="md:w-[70%] w-full mx-auto">
+                        {articles.map((article: Article) => (
+                            <div className="border-b border-[#077803] pb-2 mt-5">
+                                <p className="">{article.title}</p>
+                                <div
+                                    className="text-[#077803] cursor-pointer"
+                                    onClick={() =>
+                                        handleArticleLisn(article.qiita_id)
+                                    }
+                                >
+                                    もう一度聞く
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </DrawerContent>
         </Drawer>
     );

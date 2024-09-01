@@ -86,11 +86,18 @@ export function TimerChart({ tag }: { tag: Tag | undefined }) {
             const data = await res.json();
             console.log("カテゴリごとのデータ", data);
             setAllsecond(data.allSeconds);
-            const transformedData = data.month.map((item: DateObj) => ({
-                date: item.created_at.split("T")[0],
-                desktop: 1,
-                mobile: item.time_second * 150, // time_second を 150 倍する
-            }));
+            // const transformedData = data.month.map((item: DateObj) => ({
+            //     date: item.created_at.split("T")[0],
+            //     desktop: 1,
+            //     mobile: item.time_second * 150, // time_second を 150 倍する
+            // }));
+            const transformedData = Object.entries(data.month).map(
+                ([key, value]) => ({
+                    date: key,
+                    desktop: 1,
+                    mobile: value,
+                })
+            );
             console.log(transformedData);
             setDateObj(transformedData);
             console.log(dateObj);
@@ -98,11 +105,9 @@ export function TimerChart({ tag }: { tag: Tag | undefined }) {
         }
     };
     type DateObj = {
-        created_at: string;
-        id: number;
-        tag_id: number;
-        time_second: number;
-        user_id: string;
+        date: string;
+        desktop: number;
+        mobile: unknown;
     };
     const [dateObj, setDateObj] = React.useState<DateObj[]>();
     React.useEffect(() => {
