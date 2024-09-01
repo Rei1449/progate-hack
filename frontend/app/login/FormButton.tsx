@@ -5,7 +5,7 @@ const FormButton = () => {
     return (
         <div className="md:w-[48%] w-full">
             <div className="m-auto w-fit">
-                <p className="text-[100px]">Login</p>
+                <p className="md:text-[100px] text-[50px]">Login</p>
                 <button
                     onClick={() => signIn("github", { callbackUrl: "/" })}
                     className="block bg-gray-200 w-[300px] text-black px-5 py-2 rounded-md border border-gray-400"

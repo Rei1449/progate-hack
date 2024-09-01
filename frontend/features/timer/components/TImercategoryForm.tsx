@@ -13,16 +13,13 @@ export default function TImercategoryForm({
     const { data } = useSession();
     const [tag, setTag] = useState("");
     const postTag = async (e: React.FormEvent<HTMLFormElement>) => {
+        setIsLoading(true);
         e.preventDefault();
         if (!data) {
             router.push("/login");
         }
-        // if (!data?.user.id) {
-        //     return;
-        // }
         e.preventDefault();
         const userId = data?.user.id;
-        console.log("userId", userId);
 
         const res = await fetch(
             "https://kzaecka7sp.us-west-2.awsapprunner.com/tag/create",
@@ -43,10 +40,12 @@ export default function TImercategoryForm({
                 return [...prev, data.text];
             });
         }
+        setIsLoading(false);
     };
     const handleChangeTag = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTag(e.target.value);
     };
+    const [isLoading, setIsLoading] = useState(false);
     return (
         <form
             onSubmit={(e) => postTag(e)}
@@ -60,9 +59,15 @@ export default function TImercategoryForm({
                 placeholder="add task"
                 className="w-[85%] border-b border-gray-800 bg-transparent px-1 py-2  mt-2 outline-none focus:outline-none focus:duration-300"
             />
-            <button className="hover:duration-300 hover:bg-gray-600 absolute right-0 top-[10px] bg-gray-800 p-1 w-[32px] rounded-full">
-                ＋
-            </button>
+            {isLoading ? (
+                <div className="load-task absolute right-0 top-[10px]"></div>
+            ) : (
+                <>
+                    <button className="hover:duration-300 hover:bg-gray-600 absolute right-0 top-[10px] bg-gray-800 p-1 w-[32px] rounded-full">
+                        ＋
+                    </button>
+                </>
+            )}
         </form>
     );
 }

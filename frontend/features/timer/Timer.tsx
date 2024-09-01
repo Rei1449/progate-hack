@@ -64,18 +64,26 @@ export default function Timer() {
     };
 
     const handleClickTag = (tag: Tag, id: number) => {
-        setViewTag(tag);
-        const data = selectTagTodaydata(id);
-        setPropTodayData(data);
-        setSendTag(tag);
-        if (seconds > 0 && confirm("現在の作業を完了しますか？")) {
-            stopTimer();
-            postTime();
+        if (seconds === 0) {
+            setViewTag(tag);
+            const data = selectTagTodaydata(id);
+            setPropTodayData(data);
+            setSendTag(tag);
+        }
+        if (seconds > 0) {
+            if (confirm("現在の作業を完了しますか？")) {
+                stopTimer();
+                postTime();
+            } else {
+                return;
+            }
         }
     };
 
     const [sendtag, setSendTag] = useState<Tag>();
+    const [isLoading, setIsLoading] = useState(false);
     const postTime = async () => {
+        setIsLoading(true);
         if (!data?.user.id) {
             return;
         }
@@ -98,10 +106,12 @@ export default function Timer() {
             const data = await res.json();
             const usedata: TodayData = data.text;
             console.log("res timer", usedata);
+
             setPropTodayData((prev) => {
                 return [...prev, usedata];
             });
         }
+        setIsLoading(false);
     };
 
     const [tags, setTags] = useState<Tag[]>([]);
@@ -159,7 +169,10 @@ export default function Timer() {
                 {viewTag === undefined ? (
                     <h1>welcome to time</h1>
                 ) : (
-                    <>{viewTag?.title}</>
+                    <div className="flex items-center">
+                        <p>{viewTag?.title}</p>
+                        {isLoading && <div className="loader-title ml-5"></div>}
+                    </div>
                 )}
             </div>
             <div className="absolute mt-5 w-[80%] m-auto right-0 left-0 flex flex-row-reverse flex-wrap md:flex-nowrap justify-between items-start">
@@ -216,9 +229,11 @@ export default function Timer() {
                 </div>
             </div>
             <Drawer>
-                <DrawerTrigger className="bg-black py-[12px] fixed bottom-0 right-0 left-0 w-[90%] rounded-md mx-auto ">
-                    {viewTag?.title} 記録を見る
-                </DrawerTrigger>
+                {viewTag !== undefined && (
+                    <DrawerTrigger className="bg-[#0e0e0e] py-[12px] fixed bottom-0 right-0 left-0 w-[90%] rounded-md mx-auto ">
+                        {viewTag?.title} 記録を見る
+                    </DrawerTrigger>
+                )}
                 <DrawerContent className="bg-[#161616] border-none min-h-[400px]">
                     <DrawerTitle className="hidden ">記録</DrawerTitle>
                     <TimerChart tag={viewTag} />

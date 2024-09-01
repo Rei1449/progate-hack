@@ -73,10 +73,12 @@ export function TimerChart({ tag }: { tag: Tag | undefined }) {
     const [allSecond, setAllsecond] = React.useState<number>();
 
     const { data } = useSession();
+    const [isLoading, setIsLoading] = React.useState(false);
     const getChartData = async () => {
         if (!data?.user.id) {
             return;
         }
+        setIsLoading(true);
         const res = await fetch(
             `https://kzaecka7sp.us-west-2.awsapprunner.com/time/month/${tag?.id}/${data?.user.id}`
         );
@@ -84,13 +86,30 @@ export function TimerChart({ tag }: { tag: Tag | undefined }) {
             const data = await res.json();
             console.log("カテゴリごとのデータ", data);
             setAllsecond(data.allSeconds);
+            const transformedData = data.month.map((item: DateObj) => ({
+                date: item.created_at.split("T")[0],
+                desktop: 1,
+                mobile: item.time_second * 150, // time_second を 150 倍する
+            }));
+            console.log(transformedData);
+            setDateObj(transformedData);
+            console.log(dateObj);
+            setIsLoading(false);
         }
     };
+    type DateObj = {
+        created_at: string;
+        id: number;
+        tag_id: number;
+        time_second: number;
+        user_id: string;
+    };
+    const [dateObj, setDateObj] = React.useState<DateObj[]>();
     React.useEffect(() => {
         getChartData();
     }, []);
     const [activeChart, setActiveChart] =
-        React.useState<keyof typeof chartConfig>("desktop");
+        React.useState<keyof typeof chartConfig>("mobile");
 
     return (
         <Card className="bg-[#161616]  border-none">
@@ -107,7 +126,7 @@ export function TimerChart({ tag }: { tag: Tag | undefined }) {
                 >
                     <BarChart
                         accessibilityLayer
-                        data={chartData}
+                        data={dateObj}
                         margin={{
                             left: 12,
                             right: 12,
@@ -152,9 +171,16 @@ export function TimerChart({ tag }: { tag: Tag | undefined }) {
                     </BarChart>
                 </ChartContainer>
                 <div className="md:w-[80%] w-[90%] mx-auto text-white">
+                    {isLoading && (
+                        <div className="mt-10">
+                            <div className="load-chart mx-auto"></div>
+                        </div>
+                    )}
                     <p className="text-right">
                         合計時間
-                        <span className="text-[100px] ml-5">{allSecond}s</span>
+                        <span className="text-[100px] ml-5 text-[#138f6c]">
+                            {allSecond}s
+                        </span>
                     </p>
                 </div>
             </CardContent>
