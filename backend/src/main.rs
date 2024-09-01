@@ -8,6 +8,7 @@ use api::tagapi::{save_tag, get_tag, get_tag_all};
 use api::timeapi::{get_month_tag, get_time, get_time_all, get_today_time, save_time};
 use api::roomapi::{save_room, get_room_all};
 use api::voiceapi::{save_qiita, save_qiita_tokio, testbinary};
+use api::uservoiceapi::get_user_qiita;
 // use api::timeapi::save_time;
 // use diesel::{insert_into, PgConnection, RunQueryDsl};
 // use log::info;
@@ -253,6 +254,7 @@ async fn main() -> std::io::Result<()> {
             .service(save_qiita)
             .service(testbinary)
             .service(save_qiita_tokio)
+            .service(get_user_qiita)
     })
     .bind(("0.0.0.0", 8080))?
     .run()
