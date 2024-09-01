@@ -11,7 +11,7 @@ pub struct CreateUserVoice {
 }
 
 #[derive(Serialize, Queryable, Debug)]
-pub struct UsserVoiceResponse {
+pub struct UserVoiceResponse {
     pub id: i32,
     pub user_id: String,
     pub qiita_id: String,
@@ -21,5 +21,5 @@ pub struct UsserVoiceResponse {
 #[derive(Serialize)]
 pub struct UsserVoicesResponse {
     pub status: String,
-    pub data: Vec<UsserVoiceResponse>
+    pub data: Vec<UserVoiceResponse>
 }
