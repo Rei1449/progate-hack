@@ -14,7 +14,6 @@ use serde::Deserialize;
 use reqwest::Client;
 use serde_json::Value;
 use tokio::time::{sleep, Duration, Instant};
-use futures::future::join_all;
 use crate::models::uservoicemodel::*;
 use crate::models::uservoicemodel::CreateUserVoice;
 use crate::schema::user_voices::{qiita_id as uv_qiita_id, user_id, title};
@@ -30,7 +29,6 @@ fn db_connect() -> PgConnection {
     let db_url = std::env::var("DATABASE_URL").expect("Database Must Be Set");
     PgConnection::establish(&db_url).expect(&format!("Error connecting to {}", &db_url))
 }
-// type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 pub struct ReturnCheckBody {
     body_text: String,
     body_code: Vec<String>
@@ -59,16 +57,12 @@ fn check_body(body_data: &str) -> ReturnCheckBody {
                     code_zone_start_n = true;
                     return_data.body_text.pop();
                     return_data.body_text.pop();
-                    // return_data.body_text.pop();
                     continue;
                 } else {
                     keep_code.pop();
                     keep_code.pop();
-                    // keep_code.pop();
                     return_data.body_code.push(keep_code.iter().collect());
                     keep_code = Vec::new();
-                    // let into_code_number = format!("```{}```",return_data.body_code.len()-1);
-                    // return_data.body_text.push_str(&into_code_number);
                     continue;
                 }
             }
@@ -116,7 +110,6 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
         println!("{}",url);
         let response = client
             .get(url)
-            // .header("Bearer", "トークン")
             .send()
             .await // 2
             .expect("Failed to send request");
@@ -126,12 +119,8 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
             .text()
             .await
             .expect("Failed to read response text"); // ここでResultをアンラップ
-        // println!("body");
-        // println!("{:#?}", body);
-        // println!("type \n {}", type_name_of_val(response));
 
         let mut return_data : String = "no data".to_string();
-        // let mut return_vec = vec![];
 
         let mut response_data: ReturnCheckBody;
 
@@ -140,21 +129,13 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
         let v: Value = serde_json::from_str(&json_str).unwrap();
         // rendered_bodyをデコードして表示
         if let Some(rendered_body) = v.get("body") {    // マークダウンを取得
-        // if let Some(rendered_body) = v.get("rendered_body") {    // html
             let decoded_html = rendered_body.as_str().unwrap();
             println!("{}", decoded_html);
             return_data = decoded_html.to_string();
-            // for i in return_data.as_str().chars(){
-            //     return_vec.push(i);
-            // }
             let list_string = return_data.as_str();
-            // let list_string = return_data.as_str().chars();
             response_data = check_body(list_string);
-            // println!("\n{:?}",return_vec);
             println!("{:?}",response_data.body_text);
             println!("{:?}",response_data.body_code);
-            // println!("{}",return_data.as_str(list_string, chars().count());
-            // return Ok(response_data);
         } else {
             println!("No rendered_body found");
             let void_return = ReturnCheckBody {
@@ -163,15 +144,6 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
             };
             response_data = void_return;
         }
-        // print!("[:?]}",ret.texe);
-        // Ok(ret)
-        // return Ok(response_data);
-        let json_string = format!(
-            "{{\"text\":{},\"code\":{:?},\"arr\":{}}}",
-            response_data.body_text,
-            response_data.body_code,
-            42
-        );
 
         let audio_text = response_data.body_text.replace("\r\n", "").replace("```", "").replace("\n", "").replace("#", "");
 
@@ -237,8 +209,6 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
             // .execute(& mut connection)
             .expect("Error inserting new time");
 
-        println!("{:?}",return_voice_data);
-
         // HTTPレスポンスを返す
         HttpResponse::Ok().content_type("audio/wav").body(buffer) // ここreturn_voice_data.~~~の形で書きたい
     }
@@ -299,9 +269,6 @@ async fn store_user_voices(confilm_user_id:String, confilm_qiita_id:String) -> b
         true
     }
     else {
-
-        println!("false\n{:?}",data);
-
         let input_user_voice = CreateUserVoice {
             user_id: String::from(confilm_user_id.clone()), 
             qiita_id: String::from(confilm_qiita_id.clone()), 
@@ -419,12 +386,11 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
         title: String::from(v_title.as_str().unwrap())
     };
 
-    let mut connection = db_connect();
-    let return_voice_data = diesel::insert_into(voices)
-        .values(&input_voice)
-        .get_result::<VoiceResponse>(&mut connection)?;
-    
-    let store_user_voice = store_user_voices(info.user_id.clone(), info.qiita_id.clone()).await;
+    // let mut connection = db_connect();
+    // let return_voice_data = diesel::insert_into(voices)
+    //     .values(&input_voice)
+    //     .get_result::<VoiceResponse>(&mut connection)?;
+    // let store_user_voice = store_user_voices(info.user_id.clone(), info.qiita_id.clone()).await;
 
     Ok(HttpResponse::Ok().content_type("audio/wav").body(buffer))
 }

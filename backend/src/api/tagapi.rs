@@ -1,39 +1,20 @@
 use actix_web::HttpResponse;
-// use actix_web::http::StatusCode;
 use actix_web::{get, post, web, Result};
-
-// use std::env;
 use diesel::prelude::*;
-
 use crate::models::tagmodel::*;
-
 use diesel::Connection;
-
 use diesel::pg::PgConnection;
-
 use dotenv::dotenv;
-
-// use actix_web::{ Data };
-// use crate::database::Pool;
-
-// use diesel::pg::PgConnection;
-// use diesel::r2d2::{self, ConnectionManager};
-// pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 use serde::Deserialize;
 #[derive(Deserialize)]
 struct Info {
     user_id: String,
 }
 
-
 fn db_connect() -> PgConnection {
-
     dotenv().ok();
-
     let db_url = std::env::var("DATABASE_URL").expect("Database Must Be Set");
-
     PgConnection::establish(&db_url).expect(&format!("Error connecting to {}", &db_url))
-
 }
 
 #[post("/tag/create")]
@@ -69,7 +50,6 @@ pub async fn get_tag(info: web::Json<Info>) -> Result<HttpResponse> {
     
     let json_string = serde_json::to_string(&data).unwrap();
 
-    // Ok(HttpResponse::Ok().json("Tag Create Success."))
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(
@@ -90,7 +70,6 @@ pub async fn get_tag_all() -> Result<HttpResponse> {
     
     let json_string = serde_json::to_string(&data).unwrap();
 
-    // Ok(HttpResponse::Ok().json("Tag Create Success."))
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(

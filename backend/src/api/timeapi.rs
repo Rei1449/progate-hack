@@ -1,23 +1,12 @@
 use actix_web::HttpResponse;
-// use actix_web::http::StatusCode;
 use actix_web::{get, post, web, Result};
-
-// use std::env;
 use diesel::prelude::*;
-use diesel::sql_types::Timestamp;
-
 use crate::models::timemodel::*;
-
 use diesel::Connection;
-
 use diesel::pg::PgConnection;
-
-use dotenv::dotenv;
-
 use serde::Deserialize;
-
 use std::collections::HashMap;
-use chrono::NaiveDateTime;
+use dotenv::dotenv;
 
 #[derive(Deserialize)]
 struct Info {
@@ -29,16 +18,10 @@ struct ManthInfo {
     userid: String,
 }
 
-
-
 fn db_connect() -> PgConnection {
-
     dotenv().ok();
-
     let db_url = std::env::var("DATABASE_URL").expect("Database Must Be Set");
-
     PgConnection::establish(&db_url).expect(&format!("Error connecting to {}", &db_url))
-
 }
 
 #[post("/time/create")]
@@ -49,7 +32,6 @@ pub async fn save_time(time: web::Json<CreateTime>) -> Result<HttpResponse> {
     let time_data = diesel::insert_into(times)
         .values(&time.into_inner())
         .get_result::<TimeResponse>(& mut connection)
-        // .execute(& mut connection)
         .expect("Error inserting new time");
 
     Ok(HttpResponse::Ok()
@@ -68,14 +50,12 @@ pub async fn get_time(info: web::Json<Info>) -> Result<HttpResponse> {
     println!("{}",info.user_id);
 
     let data:Vec<TimeResponse> = times
-        // .select((id,time_second,user_id,tag_id,created_at))
         .filter(user_id.eq(info.user_id.clone()))
         .load(&mut connection)
         .unwrap();
     
     let json_string = serde_json::to_string(&data).unwrap();
 
-    // Ok(HttpResponse::Ok().json("Tag Create Success."))
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(
@@ -96,7 +76,6 @@ pub async fn get_time_all() -> Result<HttpResponse> {
     
     let json_string = serde_json::to_string(&data).unwrap();
 
-    // Ok(HttpResponse::Ok().json("Tag Create Success."))
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .body(
@@ -122,7 +101,6 @@ pub async fn get_today_time(path: web::Path<String>) -> Result<HttpResponse> {
     println!("{}",today_start);
 
     let data:Vec<TimeResponse> = times
-    // .select((id,time_second,user_id,tag_id,created_at))
         .filter(created_at.gt(today_start))
         .filter(user_id.eq(userid))
         .load(&mut connection)
@@ -168,17 +146,15 @@ pub async fn get_month_tag(info: web::Path<ManthInfo>) -> Result<HttpResponse> {
         .filter(tag_id.eq(tagid))
         .load(&mut connection)
         .unwrap();
-    // let mut month:HashMap<chrono::Date<chrono_tz::Tz>, i128> = HashMap::new();
+
     let jst = Tokyo.from_utc_datetime(&chrono::Utc::now().naive_utc());
     let mut month:HashMap<u32, i128> = HashMap::new();
+    
     for i in 1..32{
         month.insert(i, 0);
     }
-    // let month_total_vec:Vec<i128> = vec![];
     for d in &data{
-        // let day = Tokyo.ymd(jst.year(), jst.month(), d.created_at.day());
         let day = d.created_at.day();
-        // let time = 
         if let Some(total_time) = month.get_mut(&day) {
             *total_time += d.time_second as i128;
         }

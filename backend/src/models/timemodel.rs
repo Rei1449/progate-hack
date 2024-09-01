@@ -1,10 +1,6 @@
-use diesel::data_types::PgTimestamp;
-use diesel::sql_types::Timestamp;
 use serde::{Deserialize, Serialize};
 use crate::schema::times;
 use diesel::prelude::*;
-use chrono::NaiveDateTime;
-use chrono::prelude::*;
 
 #[derive(Queryable, Insertable, Serialize, Deserialize)]
 #[table_name = "times"]
