@@ -1,25 +1,15 @@
-use std;
-use actix_web::http::header::{Accept, ACCEPT};
-use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
+use actix_web::{get, App, HttpServer, HttpResponse};
 use api::tagapi::{save_tag, get_tag, get_tag_all};
 use api::timeapi::{get_month_tag, get_time, get_time_all, get_today_time, save_time};
 use api::roomapi::{save_room, get_room_all};
 use api::voiceapi::{save_qiita, save_qiita_tokio, testbinary};
 use api::uservoiceapi::get_user_qiita;
 use reqwest::Client;
-use reqwest::header::{HeaderMap, CONTENT_TYPE};
 use actix_cors::Cors;
-
-#[macro_use]
-extern crate diesel;
 
 mod api;
 mod models;
 mod schema;
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
-}
 
 // バイナリ形式でフロントに音声データを渡せた！
 #[get("/vv")]

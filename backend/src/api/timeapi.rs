@@ -147,9 +147,9 @@ pub async fn get_month_tag(info: web::Path<ManthInfo>) -> Result<HttpResponse> {
         .load(&mut connection)
         .unwrap();
 
-    let jst = Tokyo.from_utc_datetime(&chrono::Utc::now().naive_utc());
+    let _jst = Tokyo.from_utc_datetime(&chrono::Utc::now().naive_utc());
     let mut month:HashMap<u32, i128> = HashMap::new();
-    
+
     for i in 1..32{
         month.insert(i, 0);
     }

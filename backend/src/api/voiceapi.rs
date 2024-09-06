@@ -1,11 +1,13 @@
 use actix_web::HttpResponse;
+use chrono_tz::Asia::Srednekolymsk;
 use std;
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
 use actix_web::{get, post, web, Result, Responder};
 use diesel::prelude::*;
+use crate::api::uservoiceapi::get_user_qiita;
 use crate::models::voicemodel::*;
-use crate::schema::voices::{qiita_id, voice_data};
+use crate::schema::voices::{qiita_id};
 use crate::schema::voices::dsl::*;
 use diesel::Connection;
 use diesel::pg::PgConnection;
@@ -13,10 +15,10 @@ use dotenv::dotenv;
 use serde::Deserialize;
 use reqwest::Client;
 use serde_json::Value;
-use tokio::time::{sleep, Duration, Instant};
+use tokio::time::{Duration, Instant};
 use crate::models::uservoicemodel::*;
 use crate::models::uservoicemodel::CreateUserVoice;
-use crate::schema::user_voices::{qiita_id as uv_qiita_id, user_id, title};
+use crate::schema::user_voices::{qiita_id as uv_qiita_id, user_id};
 use crate::schema::user_voices::dsl::*;
 
 #[derive(Deserialize)]
@@ -100,7 +102,7 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
     // 既に保存してあるqiita_idかを確認したい、、、
     let binary_data = confilm_binary(info.qiita_id.clone()).await;
 
-    if binary_data.len() > 0 {
+    if !binary_data.is_empty() {
         let first_record = binary_data.first().unwrap();
         return HttpResponse::Ok().content_type("audio/wav").body(first_record.voice_data.clone())
     }
@@ -156,7 +158,8 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
         let mut first_iteration = true;
 
         for chunk in chunks {
-            let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
+            let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+            // let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
             let response = client
                 .post(url)
                 .send()
@@ -164,7 +167,8 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
                 .expect("Failed to send voicevox audio_query request");
 
             let synthesis_response = client
-                .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
+                .post("http://voicevox:50021/synthesis?speaker=3")
+                // .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
                 .header("Content-Type", "application/json")
                 .header("Accept", "audio/wav")
                 .body(response)
@@ -203,7 +207,7 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
             title: String::from("title")
         };
         let mut connection = db_connect();
-        let return_voice_data = diesel::insert_into(voices)
+        let _return_voice_data = diesel::insert_into(voices)
             .values(&input_voice)
             .get_result::<VoiceResponse>(& mut connection)
             // .execute(& mut connection)
@@ -288,22 +292,28 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
     let client = Client::new();
     let url = format!("https://qiita.com/api/v2/items/{}", info.qiita_id);
     println!("{}", url);
+
+    // 時間計測始点
+    let stert_time = Instant::now();
     
     let response = client.get(&url).send().await?;
-    println!("response \n {:?}", response);
+    // println!("response \n {:?}", response);
     
     let body = response.text().await?;
 
     let v: Value = serde_json::from_str(&body)?;
     let v_title = v.get("title").unwrap();
+
+    let end_qiita_time = Instant::now();
+    println!("qiitaAPIデータ取得 : {:?}",end_qiita_time.checked_duration_since(stert_time));
     
     let response_data = if let Some(rendered_body) = v.get("body") {
         let decoded_html = rendered_body.as_str().unwrap();
-        println!("{}", decoded_html);
+        // println!("{}", decoded_html);
         let list_string = decoded_html;
         let response_data = check_body(list_string);
-        println!("{:?}", response_data.body_text);
-        println!("{:?}", response_data.body_code);
+        // println!("{:?}", response_data.body_text);
+        // println!("{:?}", response_data.body_code);
         response_data
     } else {
         println!("No rendered_body found");
@@ -312,10 +322,16 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
             body_code: vec![]
         }
     };
-
     let audio_text = response_data.body_text.replace("\r\n", "").replace("```", "").replace("\n", "").replace("#", "");
 
-    let chunks = split_text_length(&audio_text, 50);
+    let split_length:usize = 400;
+
+    let end_checktext_time = Instant::now();
+    println!("整形終了 : {:?}",end_checktext_time.checked_duration_since(end_qiita_time));
+    println!("文字数 : {}",&audio_text.len());
+    println!("split length : {}",split_length);
+
+    let chunks = split_text_length(&audio_text, split_length); //　文字分割
     let mut audio_binary: Vec<u8> = Vec::new();
     let mut header: Vec<u8> = Vec::with_capacity(44);
     let mut first_iteration = true;
@@ -330,11 +346,16 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
         let audio_map = Arc::clone(&audio_map);
 
         let task = tokio::spawn(async move {
-            let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
+            println!("Task {}  ",i);
+            let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+            // let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
             let response = client.post(&url).send().await?;
 
+            println!("Check : {}",i);
+
             let synthesis_response = client
-                .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
+                .post("http://voicevox:50021/synthesis?speaker=3")
+                // .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
                 .header("Content-Type", "application/json")
                 .header("Accept", "audio/wav")
                 .body(response.text().await?)
@@ -342,9 +363,11 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
                 .await?;
 
             let audio_data = synthesis_response.bytes().await?;
-
             let mut audio_map = audio_map.lock().unwrap();
             audio_map.insert(i, audio_data);
+
+            println!("End {}  ",i);
+
             Ok::<_, Box<dyn std::error::Error + Send + Sync>>(())
         });
         tasks.push(task);
@@ -353,6 +376,9 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
     for task in tasks {
         let _ = task.await?;
     }
+
+    let end_vvapi_time = Instant::now();
+    println!("音声変換終了 : {:?}",end_vvapi_time.checked_duration_since(end_checktext_time));
 
     let audio_map = Arc::try_unwrap(audio_map)
         .expect("Failed to unwrap Arc")
@@ -391,6 +417,8 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
     //     .values(&input_voice)
     //     .get_result::<VoiceResponse>(&mut connection)?;
     // let store_user_voice = store_user_voices(info.user_id.clone(), info.qiita_id.clone()).await;
+    let end_this_api = Instant::now();
+    println!("全体終了 : {:?}",end_this_api.checked_duration_since(end_vvapi_time));
 
     Ok(HttpResponse::Ok().content_type("audio/wav").body(buffer))
 }
