@@ -1,7 +1,5 @@
 use actix_web::HttpResponse;
-// use actix_web::http::StatusCode;
-use actix_web::{get, post, web, Result};
-// use std::env;
+use actix_web::{get, web, Result};
 use diesel::prelude::*;
 use crate::models::uservoicemodel::*;
 use diesel::Connection;

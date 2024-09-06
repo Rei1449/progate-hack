@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::schema::rooms::{self, name};
+use crate::schema::rooms::{self};
 use diesel::prelude::*;
 
 #[derive(Queryable, Insertable, Serialize, Deserialize)]
