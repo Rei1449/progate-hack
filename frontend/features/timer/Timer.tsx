@@ -5,10 +5,9 @@ import { TimerChart } from "./components/TimerChart";
 
 import dynamic from "next/dynamic";
 
-// ダイナミックインポート
 const TimerLog = dynamic(() => import("./components/TimerLog"));
 const TimerCategories = dynamic(() => import("./components/TimerCategories"));
-const TImerTagForm = dynamic(() => import("./components/TImercategoryForm"));
+const TImerTagForm = dynamic(() => import("./components/TimerCategoryForm"));
 
 import {
     Drawer,
@@ -92,16 +91,13 @@ export default function Timer() {
             time_second: seconds,
             tag_id: sendtag?.id,
         };
-        const res = await fetch(
-            "https://kzaecka7sp.us-west-2.awsapprunner.com/time/create",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(sendData),
-            }
-        );
+        const res = await fetch("http://localhost:8080/time/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sendData),
+        });
         if (res.ok) {
             const data = await res.json();
             const usedata: TodayData = data.text;
@@ -120,16 +116,13 @@ export default function Timer() {
         if (!data?.user.id) {
             return;
         }
-        const res = await fetch(
-            "https://kzaecka7sp.us-west-2.awsapprunner.com/tag",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ user_id: data?.user.id }),
-            }
-        );
+        const res = await fetch("http://localhost:8080/tag", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id: data?.user.id }),
+        });
         if (res.ok) {
             const data = await res.json();
             const string = data.text;
@@ -148,7 +141,7 @@ export default function Timer() {
             return;
         }
         const res = await fetch(
-            `https://kzaecka7sp.us-west-2.awsapprunner.com/time/today/${data?.user.id}`
+            `http://localhost:8080/time/today/${data?.user.id}`
         );
         if (res.ok) {
             const data = await res.json();
@@ -165,18 +158,18 @@ export default function Timer() {
                     tags={tags}
                 />
             </div>
-            <div className="text-2xl xl:text-6xl lg:text-4xl w-[85%] m-auto mt-10 ">
+            <div className="text-2xl xl:text-4xl lg:text-4xl w-[85%] m-auto mt-10 ">
                 {viewTag === undefined ? (
                     <h1>welcome to time</h1>
                 ) : (
                     <div className="flex items-center">
-                        <p>{viewTag?.title}</p>
+                        <p className="ml-5 text-gray-400">{viewTag?.title}</p>
                         {isLoading && <div className="loader-title ml-5"></div>}
                     </div>
                 )}
             </div>
             <div className="absolute mt-5 w-[80%] m-auto right-0 left-0 flex flex-row-reverse flex-wrap md:flex-nowrap justify-between items-start">
-                <div className="md:w-[70%] w-full lg:ml-10 md:ml-5 ml-0">
+                <div className="md:w-[75%] w-full lg:ml-10 md:ml-5 ml-0">
                     <p className="md:mt-0 mt-[-20px] xl:text-[250px] lg:text-[200px] md:text-[140px] text-[100px] w-fit m-auto md:w-0 md:m-0 text-gray-300">
                         {formatTime(seconds)}
                     </p>
@@ -224,7 +217,7 @@ export default function Timer() {
                         )}
                     </div>
                 </div>
-                <div className="md:w-[30%] w-full">
+                <div className="md:w-[25%] w-full">
                     <TimerLog propTodayData={propTodayData} />
                 </div>
             </div>

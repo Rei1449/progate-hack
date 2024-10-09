@@ -33,6 +33,7 @@ export const useTimer = () => {
         alert(`お疲れ様でした！ 時間： ${seconds} seconds`);
         setSeconds(0);
     };
+
     const formatTime = (totalSeconds: number) => {
         const minutes = Math.floor(totalSeconds / 60);
         const secs = totalSeconds % 60;

@@ -46,7 +46,7 @@ export function TimerChart({ tag }: { tag: Tag | undefined }) {
         }
         setIsLoading(true);
         const res = await fetch(
-            `https://kzaecka7sp.us-west-2.awsapprunner.com/time/month/${tag?.id}/${data?.user.id}`
+            `http://localhost:8080/time/month/${tag?.id}/${data?.user.id}`
         );
         if (res.ok) {
             const data = await res.json();

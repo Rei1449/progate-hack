@@ -28,11 +28,11 @@ export default function Reading() {
     const router = useRouter();
     const handleArticleLisn = async (id: string) => {
         setIsLoading(true);
-        if (!data) {
-            router.push("/login");
-        }
+        // if (!data) {
+        //     router.push("/login");
+        // }
         const synthesis_response = await fetch(
-            "https://kzaecka7sp.us-west-2.awsapprunner.com/qiita/tokio",
+            "http://localhost:8080/qiita/tokio",
             {
                 method: "POST",
                 headers: {
@@ -59,11 +59,11 @@ export default function Reading() {
     const handleUrlSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
-        if (!data) {
-            router.push("/login");
-        }
+        // if (!data) {
+        //     router.push("/login");
+        // }
         const synthesis_response = await fetch(
-            "https://kzaecka7sp.us-west-2.awsapprunner.com/qiita/tokio",
+            "http://localhost:8080/qiita/tokio",
             {
                 method: "POST",
                 headers: {
@@ -102,10 +102,10 @@ export default function Reading() {
     };
     const [articles, setArticles] = useState<Article[]>([]);
     const getArticle = async () => {
-        if (!data?.user.id) {
-            return;
-        }
-        const res = await fetch(`https://kzaecka7sp.us-west-2.awsapprunner.com/qiita/${data?.user.id}`);
+        // if (!data?.user.id) {
+        //     return;
+        // }
+        const res = await fetch(`http://localhost:8080/qiita/${1}`);
         if (res.ok) {
             const data = await res.json();
             console.log("data yo", data);
@@ -121,7 +121,7 @@ export default function Reading() {
                 <img src="./music.svg" className="w-[20px]" />
                 <p className="md:block hidden ml-2">Article</p>
             </DrawerTrigger>
-            <DrawerContent className="h-[60%] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
+            <DrawerContent className="h-[92vh] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
                 <DrawerTitle className="font-bold text-2xl text-gray-300 mt-10 w-fit md:mx-0 mx-auto">
                     Article Listening
                     <br />
