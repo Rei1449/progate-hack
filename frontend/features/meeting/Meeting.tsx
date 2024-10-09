@@ -27,9 +27,7 @@ type Room = {
 export default function Meeting() {
     const [rooms, setRooms] = useState<Room[]>([]);
     const getRooms = async () => {
-        const res = await fetch(
-            "https://kzaecka7sp.us-west-2.awsapprunner.com/room/all"
-        );
+        const res = await fetch("http://localhost:8080/room/all");
         if (res.ok) {
             const data = await res.json();
             const string = data.text;
@@ -46,16 +44,13 @@ export default function Meeting() {
     };
     const postRoom = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const res = await fetch(
-            "https://kzaecka7sp.us-west-2.awsapprunner.com/room/create",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ name: sendRoom }),
-            }
-        );
+        const res = await fetch("http://localhost:8080/room/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: sendRoom }),
+        });
         if (res.ok) {
             const data: BackRoom = await res.json();
 
@@ -72,7 +67,7 @@ export default function Meeting() {
                 <img src="./chat.svg" className="w-[20px]" />
                 <p className="ml-2 md:block hidden">Video</p>
             </DrawerTrigger>
-            <DrawerContent className="max-h-[80%] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
+            <DrawerContent className="max-h-[92vh] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
                 <DrawerTitle className="font-bold text-2xl text-gray-300 mt-10 w-fit md:mx-0 mx-auto">
                     Video Room
                 </DrawerTitle>
