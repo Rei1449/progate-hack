@@ -65,11 +65,11 @@ export default function Meeting() {
         <Drawer>
             <DrawerTrigger className="md:ml-5 ml-2 flex items-center">
                 <img src="./chat.svg" className="w-[20px]" />
-                <p className="ml-2 md:block hidden">Video</p>
+                <p className="ml-2 md:block hidden">Meeting</p>
             </DrawerTrigger>
             <DrawerContent className="max-h-[92vh] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
                 <DrawerTitle className="font-bold text-2xl text-gray-300 mt-10 w-fit md:mx-0 mx-auto">
-                    Video Room
+                    Meeting
                 </DrawerTitle>
                 <form onSubmit={(e) => postRoom(e)}>
                     <input

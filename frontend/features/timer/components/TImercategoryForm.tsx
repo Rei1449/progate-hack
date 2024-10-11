@@ -46,21 +46,21 @@ export default function TimerCategoryForm({
     return (
         <form
             onSubmit={(e) => postTag(e)}
-            className="md:w-[20%] w-[90%] m-auto relative md:mt-0"
+            className="md:w-[30%] w-[90%] relative md:mt-0"
         >
             <input
                 value={tag}
                 onChange={(e) => handleChangeTag(e)}
                 type="text"
                 name="category"
-                placeholder="add task"
-                className="w-[85%] border-b border-gray-800 bg-transparent px-1 py-2  mt-2 outline-none focus:outline-none focus:duration-300"
+                placeholder="タスクを追加する"
+                className="w-[85%] border-b border-gray-700 bg-transparent duration-300 px-2 py-2  mt-2 outline-none focus:outline-none focus:duration-300"
             />
             {isLoading ? (
                 <div className="load-task absolute right-0 top-[10px]"></div>
             ) : (
                 <>
-                    <button className="hover:duration-300 hover:bg-gray-600 absolute right-0 top-[10px] bg-gray-800 p-1 w-[32px] rounded-full">
+                    <button className="hover:duration-300 hover:bg-gray-600 absolute right-[10px] top-[10px] bg-gray-700 p-1 w-[32px] rounded-full">
                         ＋
                     </button>
                 </>

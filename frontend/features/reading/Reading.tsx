@@ -119,11 +119,11 @@ export default function Reading() {
         <Drawer>
             <DrawerTrigger className="md:ml-5 ml-2 flex items-center">
                 <img src="./music.svg" className="w-[20px]" />
-                <p className="md:block hidden ml-2">Article</p>
+                <p className="md:block hidden ml-2">Listening</p>
             </DrawerTrigger>
             <DrawerContent className="h-[92vh] bg-[#1f1f1f] border-none md:px-10 px-2 py-1">
                 <DrawerTitle className="font-bold text-2xl text-gray-300 mt-10 w-fit md:mx-0 mx-auto">
-                    Article Listening
+                    Listening
                     <br />
                     <span className="text-[12px]">VOICEVOX:ずんだもん</span>
                 </DrawerTitle>
@@ -185,7 +185,10 @@ export default function Reading() {
                     <p className="text-[#077803] ml-1">過去に聞いた記事</p>
                     <div className="md:w-[70%] w-full mx-auto">
                         {articles.map((article: Article) => (
-                            <div className="border-b border-[#077803] pb-2 mt-5">
+                            <div
+                                className="border-b border-[#077803] pb-2 mt-5"
+                                key={article.qiita_id}
+                            >
                                 <p className="">{article.title}</p>
                                 <div
                                     className="text-[#077803] cursor-pointer"

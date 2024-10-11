@@ -19,6 +19,7 @@ import {
 import { useSession } from "next-auth/react";
 
 import { DefaultSession } from "next-auth";
+import TimerTodayCategories from "./components/TimerTodayCategories";
 
 declare module "next-auth" {
     interface Session {
@@ -41,7 +42,15 @@ export type TodayData = {
     user_id: string;
 };
 
-export default function Timer() {
+export default function Timer({
+    handleClickChangeTimerMode,
+    timerMode,
+}: {
+    handleClickChangeTimerMode: (
+        e: React.MouseEvent<HTMLParagraphElement, MouseEvent>
+    ) => void;
+    timerMode: string;
+}) {
     const { data } = useSession();
 
     const {
@@ -151,16 +160,42 @@ export default function Timer() {
 
     return (
         <>
-            <div className="flex flex-row-reverse flex-wrap justify-between items-center md:w-[85%] w-[90%] mt-2 m-auto">
+            <div className="flex justify-between flex-row-reverse flex-wrap items-center w-[90%] md:w-[85%] pt-[100px] mx-auto">
                 <TImerTagForm setTags={setTags} />
+                <div className="flex">
+                    <div
+                        onClick={(e) => handleClickChangeTimerMode(e)}
+                        className="cursor-pointer"
+                        id="common"
+                    >
+                        長期todo
+                    </div>
+                    <div
+                        onClick={(e) => handleClickChangeTimerMode(e)}
+                        className="cursor-pointer ml-5"
+                        id="today"
+                    >
+                        今日のtodo
+                    </div>
+                </div>
+            </div>
+            {timerMode === "common" ? (
                 <TimerCategories
                     handleClickCategory={handleClickTag}
                     tags={tags}
+                    timerMode={timerMode}
                 />
-            </div>
+            ) : (
+                <TimerTodayCategories
+                    handleClickCategory={handleClickTag}
+                    tags={tags}
+                    timerMode={timerMode}
+                />
+            )}
+
             <div className="text-2xl xl:text-4xl lg:text-4xl w-[85%] m-auto mt-10 ">
                 {viewTag === undefined ? (
-                    <h1>welcome to time</h1>
+                    <h1>Welcome to Time</h1>
                 ) : (
                     <div className="flex items-center">
                         <p className="ml-5 text-gray-400">{viewTag?.title}</p>
@@ -168,9 +203,9 @@ export default function Timer() {
                     </div>
                 )}
             </div>
-            <div className="absolute mt-5 w-[80%] m-auto right-0 left-0 flex flex-row-reverse flex-wrap md:flex-nowrap justify-between items-start">
-                <div className="md:w-[75%] w-full lg:ml-10 md:ml-5 ml-0">
-                    <p className="md:mt-0 mt-[-20px] xl:text-[250px] lg:text-[200px] md:text-[140px] text-[100px] w-fit m-auto md:w-0 md:m-0 text-gray-300">
+            <div className="absolute mt-5 w-[85%] m-auto right-0 left-0 flex flex-row-reverse flex-wrap md:flex-nowrap justify-between items-start">
+                <div className="md:w-[68%] w-full lg:ml-10 md:ml-5 ml-0">
+                    <p className="leading-tight md:mt-0 mt-[-20px] xl:text-[260px] lg:text-[200px] md:text-[140px] text-[100px]  m-auto h-fit md:w-0 md:m-0 text-gray-300">
                         {formatTime(seconds)}
                     </p>
                     <div className="flex justify-between border-t border-gray-800">
@@ -218,7 +253,10 @@ export default function Timer() {
                     </div>
                 </div>
                 <div className="md:w-[25%] w-full">
-                    <TimerLog propTodayData={propTodayData} />
+                    <TimerLog
+                        propTodayData={propTodayData}
+                        timerMode={timerMode}
+                    />
                 </div>
             </div>
             <Drawer>
