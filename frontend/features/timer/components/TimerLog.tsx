@@ -9,8 +9,10 @@ type PropTodaydata = {
 
 export default function TimerLog({
     propTodayData,
+    timerMode,
 }: {
     propTodayData: TodayData[] | undefined;
+    timerMode: string;
 }) {
     const extractFields = (propTodayData: TodayData[] | undefined) => {
         return propTodayData?.map((item) => {
@@ -39,7 +41,11 @@ export default function TimerLog({
     };
     return (
         <div className="">
-            <div className="md:mt-5 mt-2 w-[100%] bg-[#212121] lg:h-[400px] h-[150px] rounded-xl xl:p-10 p-5 overflow-y-scroll no-bar">
+            <div
+                className={`md:mt-5 mt-2 w-[100%] ${
+                    timerMode === "common" ? "bg-[#212121]" : "bg-[#253349]"
+                } lg:h-[400px] h-[150px] rounded-xl xl:p-10 p-5 overflow-y-scroll no-bar`}
+            >
                 {parsedData?.length === 0 ? (
                     <>
                         <p className="text-gray-500">

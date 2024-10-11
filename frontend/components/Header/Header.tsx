@@ -16,9 +16,9 @@ import { NextAuthProvider } from "@/lib/next-auth/provider";
 
 export default function Header() {
     return (
-        <header className=" w-screen top-0">
-            <div className="flex items-center justify-between p-5 md:w-[85%] w-[95%] m-auto border-b border-gray-800">
-                <div className="flex items-center">
+        <header className="w-screen top-0 absolute z-80 text-white">
+            <div className="flex items-center justify-between py-5 md:w-[85%] w-[95%] m-auto border-b z-40 relative border-gray-700">
+                <div className="flex items-center z-40">
                     <Clock />
                     <NextAuthProvider>
                         <AuthView />

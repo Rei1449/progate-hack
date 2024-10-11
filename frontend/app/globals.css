@@ -92,6 +92,12 @@
 .bg-origin-shadow-left {
     background: linear-gradient(to left, #181818, #18181800);
 }
+.bg-origin-shadow-right-today {
+    background: linear-gradient(to right, #1f2937, #1f293700);
+}
+.bg-origin-shadow-left-today {
+    background: linear-gradient(to left, #1f2937, #1f293700);
+}
 .loader {
     width: 50px;
     aspect-ratio: 1;
@@ -112,7 +118,7 @@
     }
 }
 .loader-title {
-    width: 50px;
+    width: 40px;
     aspect-ratio: 1;
     border-radius: 50%;
     background: radial-gradient(farthest-side, #363636 94%, #0000) top/8px 8px

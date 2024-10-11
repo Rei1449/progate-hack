@@ -24,7 +24,7 @@ export default function RootLayout({
                     rel="stylesheet"
                 ></link>
             </head>
-            <body className="w-screen max-h-screen font-origin bg-original bg-[#181818] text-white">
+            <body className="w-screen max-h-screen font-origin bg-original text-white">
                 <Header />
                 {children}
             </body>

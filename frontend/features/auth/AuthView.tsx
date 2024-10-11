@@ -5,7 +5,7 @@ import React from "react";
 export default function AuthView() {
     const { data } = useSession();
     return (
-        <div className="ml-5 border-l pl-5 flex items-center">
+        <div className="ml-5 border-l pl-5 flex items-center border-gray-700">
             {data && (
                 <>
                     <img
