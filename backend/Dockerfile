@@ -2,14 +2,14 @@ FROM rust:latest
 
 WORKDIR /usr/src/app
 
-CMD ["cargo", "run"]
+# CMD ["cargo", "run"]
 
-# COPY . .
+COPY . .
 
-# RUN cargo build --release
+RUN cargo build --release
 
-# ENV PORT 8080
+ENV PORT 8080
 
-# WORKDIR /usr/src/app/target/release
+WORKDIR /usr/src/app/target/release
 
-# CMD ["./backend"]
+CMD ["./backend"]
