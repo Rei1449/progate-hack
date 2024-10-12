@@ -32,7 +32,7 @@ export default function Reading() {
         //     router.push("/login");
         // }
         const synthesis_response = await fetch(
-            "http://localhost:8080/qiita/tokio",
+            "https://geek-ten-backend-178548739799.asia-northeast1.run.app/qiita/tokio",
             {
                 method: "POST",
                 headers: {
@@ -63,7 +63,7 @@ export default function Reading() {
         //     router.push("/login");
         // }
         const synthesis_response = await fetch(
-            "http://localhost:8080/qiita/tokio",
+            "https://geek-ten-backend-178548739799.asia-northeast1.run.app/qiita/tokio",
             {
                 method: "POST",
                 headers: {
@@ -105,7 +105,7 @@ export default function Reading() {
         // if (!data?.user.id) {
         //     return;
         // }
-        const res = await fetch(`http://localhost:8080/qiita/${1}`);
+        const res = await fetch(`https://geek-ten-backend-178548739799.asia-northeast1.run.app/qiita/${1}`);
         if (res.ok) {
             const data = await res.json();
             console.log("data yo", data);

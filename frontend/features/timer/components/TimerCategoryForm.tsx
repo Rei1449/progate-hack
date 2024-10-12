@@ -21,7 +21,7 @@ export default function TimerCategoryForm({
         e.preventDefault();
         const userId = data?.user.id;
 
-        const res = await fetch("http://localhost:8080/tag/create", {
+        const res = await fetch("https://geek-ten-backend-178548739799.asia-northeast1.run.app/tag/create", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

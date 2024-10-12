@@ -27,7 +27,7 @@ type Room = {
 export default function Meeting() {
     const [rooms, setRooms] = useState<Room[]>([]);
     const getRooms = async () => {
-        const res = await fetch("http://localhost:8080/room/all");
+        const res = await fetch("https://geek-ten-backend-178548739799.asia-northeast1.run.app/room/all");
         if (res.ok) {
             const data = await res.json();
             const string = data.text;
@@ -44,7 +44,7 @@ export default function Meeting() {
     };
     const postRoom = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const res = await fetch("http://localhost:8080/room/create", {
+        const res = await fetch("https://geek-ten-backend-178548739799.asia-northeast1.run.app/room/create", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

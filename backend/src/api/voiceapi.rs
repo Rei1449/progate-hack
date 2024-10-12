@@ -158,7 +158,7 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
         let mut first_iteration = true;
 
         for chunk in chunks {
-            let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+            let url = format!("https://voicevox-178548739799.asia-northeast1.run.app/audio_query?text={chunk}&speaker=3");
             // let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
             let response = client
                 .post(url)
@@ -167,7 +167,7 @@ async fn save_qiita(info: web::Json<Info>) -> HttpResponse {
                 .expect("Failed to send voicevox audio_query request");
 
             let synthesis_response = client
-                .post("http://voicevox:50021/synthesis?speaker=3")
+                .post("https://voicevox-178548739799.asia-northeast1.run.app/synthesis?speaker=3")
                 // .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
                 .header("Content-Type", "application/json")
                 .header("Accept", "audio/wav")
@@ -347,14 +347,14 @@ async fn process_qiita_tokio(info: web::Json<Info>) -> Result<HttpResponse, Box<
 
         let task = tokio::spawn(async move {
             println!("Task {}  ",i);
-            let url = format!("http://voicevox:50021/audio_query?text={chunk}&speaker=3");
+            let url = format!("https://voicevox-178548739799.asia-northeast1.run.app/audio_query?text={chunk}&speaker=3");
             // let url = format!("https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text={chunk}&speaker=3");
             let response = client.post(&url).send().await?;
 
             println!("Check : {}",i);
 
             let synthesis_response = client
-                .post("http://voicevox:50021/synthesis?speaker=3")
+                .post("https://voicevox-178548739799.asia-northeast1.run.app/synthesis?speaker=3")
                 // .post("https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3")
                 .header("Content-Type", "application/json")
                 .header("Accept", "audio/wav")

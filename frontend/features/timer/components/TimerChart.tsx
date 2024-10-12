@@ -46,7 +46,7 @@ export function TimerChart({ tag }: { tag: Tag | undefined }) {
         }
         setIsLoading(true);
         const res = await fetch(
-            `http://localhost:8080/time/month/${tag?.id}/${data?.user.id}`
+            `https://geek-ten-backend-178548739799.asia-northeast1.run.app/time/month/${tag?.id}/${data?.user.id}`
         );
         if (res.ok) {
             const data = await res.json();
