@@ -16,7 +16,7 @@ mod schema;
 async fn vv_test() -> HttpResponse {
     println!("vv");
     let client = Client::new();
-    let url = "https://vvtk3mgv4r.us-west-2.awsapprunner.com/audio_query?text=ずんだもんなのだ&speaker=3";
+    let url = "https://voicevox-178548739799.asia-northeast1.run.app/audio_query?text=ずんだもんなのだ&speaker=3";
     let response = client
         .post(url)
         .header("Content-Type", "application/json")
@@ -24,7 +24,7 @@ async fn vv_test() -> HttpResponse {
         .await
         .expect("Failed to send request");
     
-    let synthesis_url = "https://vvtk3mgv4r.us-west-2.awsapprunner.com/synthesis?speaker=3";
+    let synthesis_url = "https://voicevox-178548739799.asia-northeast1.run.app/synthesis?speaker=3";
     
     let synthesis_response = client
         .post(synthesis_url)

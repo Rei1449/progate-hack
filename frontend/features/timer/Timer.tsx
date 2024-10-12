@@ -100,7 +100,7 @@ export default function Timer({
             time_second: seconds,
             tag_id: sendtag?.id,
         };
-        const res = await fetch("http://localhost:8080/time/create", {
+        const res = await fetch("https://geek-ten-backend-178548739799.asia-northeast1.run.app/time/create", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -125,7 +125,7 @@ export default function Timer({
         if (!data?.user.id) {
             return;
         }
-        const res = await fetch("http://localhost:8080/tag", {
+        const res = await fetch("https://geek-ten-backend-178548739799.asia-northeast1.run.app/tag", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -150,7 +150,7 @@ export default function Timer({
             return;
         }
         const res = await fetch(
-            `http://localhost:8080/time/today/${data?.user.id}`
+            `https://geek-ten-backend-178548739799.asia-northeast1.run.app/time/today/${data?.user.id}`
         );
         if (res.ok) {
             const data = await res.json();
